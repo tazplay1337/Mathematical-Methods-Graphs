@@ -1,8 +1,12 @@
 #pragma once
+#include "Node.h"
 class Edge {
-public:
-	// int v1;
-	// int v2;
+private:
+	Node nodeV1;
+	Node nodeV2;
+public:	
 	Edge();
-	Edge(int v, int v2);
+	Edge(Node nodeV1, Node nodeV2);
+	Node getNodeV1();
+	Node getNodeV2();
 };

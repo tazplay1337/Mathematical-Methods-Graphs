@@ -5,20 +5,14 @@ using namespace std;
 
 Graph::Graph(){}
 
-Graph::Graph(AdjencyList initialAdjList) {
-	this->adjList = initialAdjList;
-}
-
 Graph::~Graph(void) {}
 
-void Graph::insertNode(int newNode) {
-//	this->adjList.insert({ "First", 1 });;
-
-	//newNodeY = Node(newNodeID);
-	//if (Knoten noch nicht drin)
-	//NodeListe.push(newNodeY);
+void Graph::insertNode(Node newNode) {
+	//if (Knoten noch nicht da)
+	this->allNodesOfG.insert({ newNode.getID(), newNode });
 }
 
-void Graph::insertEdge(int v1, int v2) {
-//	this->adjList.v1.insert(v2);
+void Graph::insertEdge(Edge newEdge) {
+	//if (Knoten noch nicht da)
+	this->allEdgesOfG.insert(allEdgesOfG.begin(), newEdge);
 }

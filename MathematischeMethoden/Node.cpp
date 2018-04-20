@@ -3,4 +3,10 @@
 
 Node::Node(){}
 
-Node::Node(int data){}
+Node::Node(int id){
+	this->id = id;
+}
+
+int Node::getID() {
+	return this->id;
+}
