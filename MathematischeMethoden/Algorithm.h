@@ -3,7 +3,7 @@
 #include <queue>
 class Algorithm {
 private:
-	static std::vector<Edge> breadthFirstSearch(Graph graph, std::queue<Node> &L1, std::queue<Node> &L2, std::vector<Edge> &E0);
+	static void breadthFirstSearch(Graph graph, Graph &connectedComponent, std::queue<Node> &unprocessedNodes);
 	static std::vector<Edge> depthFirstSearch();
 
 public:

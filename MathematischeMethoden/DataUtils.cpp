@@ -31,7 +31,7 @@ void importAllNodesFrom(std::ifstream &importGraph, Graph &targetGraph) {
 
 	for (int id = 0; id < std::stoi(numOfAllNodesFromImportG); id++) {
 		Node newNode = Node(id);
-		targetGraph.insertNode(newNode);
+		targetGraph.addNode(newNode);
 	}
 }
 
@@ -49,7 +49,7 @@ void importAllEdgesFrom(std::ifstream &importGraph, Graph &targetGraph) {
 		Node firstNode = getFirstNodeFrom(edgeLineInAdjacentList);
 		Node SecondNode = getSecondNodeFrom(edgeLineInAdjacentList);
 		Edge newEdge = Edge(firstNode.getID(), SecondNode.getID());
-		targetGraph.insertEdge(newEdge);
+		targetGraph.addEdge(newEdge);
 	}
 }
 

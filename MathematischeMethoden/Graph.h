@@ -13,7 +13,9 @@ public:
 	Graph();
 	~Graph();
 	bool isEmpty();
-	void insertNode(Node newNode);
-	void insertEdge(Edge newEdge);
+	void addNode(Node newNode);
+	void addEdge(Edge newEdge);
 	Node getNode(int id);
+	std::vector<int> getNeighboursID(Node node);
+	std::unordered_map<int, Node> getNodes();
 };

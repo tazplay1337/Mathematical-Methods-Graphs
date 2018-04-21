@@ -4,35 +4,30 @@
 
 Algorithm::Algorithm() {};
 
-bool checkNeighboursIfVisitedOf(Node node);
+bool unvisitedNeighboursExistOf(Node node);
 Node getUnvisitedNeighbourOf(Node node);
-Edge createEdge(Node nodeV1, Node nodeV2);
 
-std::vector<Edge> Algorithm::breadthFirstSearch(Graph graph,
-												std::queue<Node> &listOfRechedNodesInG, 
-												std::queue<Node> &listOfVisitedNodesInG, 
-												std::vector<Edge> &edgesOfConnectedComponent) {
-	if (listOfRechedNodesInG.empty()) {
-		return edgesOfConnectedComponent;
-	}
-	else {
-		Node currentNode = listOfRechedNodesInG.pop(); //Syntax noch nicht ganz richtig
+void Algorithm::breadthFirstSearch(Graph graph, Graph &connectedComponent, std::queue<Node> &unprocessedNodes) {
+	if (!unprocessedNodes.empty()) {
+		Node currentNode = unprocessedNodes.front();
+		std::vector<int> neighboursOfcurrentNode = graph.getNeighboursID(currentNode);
+		std::unordered_map<int, Node> visitedNodes = connectedComponent.getNodes();
 		
-		if (checkNeighboursIfVisitedOf(currentNode)) {
-			//Delete currentNode from listOfRechedNodesInG;
+		if (!unvisitedNeighboursExist(visitedNodes, neighboursOfcurrentNode)) {
+			unprocessedNodes.pop();
 		}
 		else {
 			Node unvisitedNode = getUnvisitedNeighbourOf(currentNode);
-			listOfRechedNodesInG.push(unvisitedNode);
-			listOfVisitedNodesInG.push(unvisitedNode);
-			Edge newEdge = createEdge(currentNode, unvisitedNode);
-			edgesOfConnectedComponent.push_back(newEdge);
-			breadthFirstSearch(graph, listOfRechedNodesInG, listOfVisitedNodesInG, edgesOfConnectedComponent);
+			unprocessedNodes.push(unvisitedNode);
+			connectedComponent.addNode(unvisitedNode);
+			Edge newEdge = Edge(currentNode, unvisitedNode);
+			connectedComponent.addEdge(newEdge);
+			breadthFirstSearch(graph, connectedComponent, unprocessedNodes);
 		}
 	}
 }
 
-bool checkNeighboursIfVisitedOf(Node node) {
+bool unvisitedNeighboursExist(std::unordered_map<int, Node> visitedNodes, std::vector<int> neighboursOfcurrentNode) {
 
 	return false;
 }
@@ -40,29 +35,24 @@ bool checkNeighboursIfVisitedOf(Node node) {
 Node getUnvisitedNeighbourOf(Node node) {
 	return Node();
 }
-
-Edge createEdge(Node nodeV1, Node nodeV2) {
-	return Edge();
-}
-
+/*
 std::vector<Edge> Algorithm::depthFirstSearch() {
 
 }
-
+*/
 
 std::vector<Graph> Algorithm::getConnectedComponentWithBFS(Graph graph) {
-	std::vector<Graph> connectedComponentsOfG;
-	std::vector<Edge> edgesOfConnectedComponent;
-	std::queue<Node> unprocessedNodesOfG;
-	std::queue<Node> visitedNodesOfG;
+	std::vector<Graph> placeholder;
+	Graph connectedComponent;
+	std::queue<Node> unprocessedNodes;
 
 	Node startNode = graph.getNode(0);
-	unprocessedNodesOfG.push(startNode);
-	visitedNodesOfG.push(startNode);
+	unprocessedNodes.push(startNode);
+	connectedComponent.addNode(startNode);
 
-	breadthFirstSearch(graph, unprocessedNodesOfG, visitedNodesOfG, edgesOfConnectedComponent);
+	breadthFirstSearch(graph, connectedComponent, unprocessedNodes);
 
-	return connectedComponentsOfG;
+	return placeholder;
 } 
 
 /*

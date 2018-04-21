@@ -7,12 +7,12 @@ Graph::Graph(){}
 
 Graph::~Graph(void) {}
 
-void Graph::insertNode(Node newNode) {
+void Graph::addNode(Node newNode) {
 	//if (Knoten noch nicht da) TODO
 	this->nodes.insert({ newNode.getID(), newNode });
 }
 
-void Graph::insertEdge(Edge newEdge) {
+void Graph::addEdge(Edge newEdge) {
 	//if (Knoten noch nicht da) TODO
 	this->edges.push_back(newEdge);
 }
@@ -29,5 +29,13 @@ Node Graph::getNode(int id) {
 	else{
 		return nodes[id];
 	}
+}
+
+std::vector<int> Graph::getNeighboursID(Node node) {
+
+}
+
+std::unordered_map<int, Node> Graph::getNodes() {
+
 }
 
