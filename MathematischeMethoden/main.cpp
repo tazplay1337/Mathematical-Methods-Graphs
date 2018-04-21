@@ -2,6 +2,7 @@
 #include "Graph.h"
 #include "Node.h"
 #include "DataUtils.h"
+#include "Algorithm.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -13,9 +14,8 @@ const string fromPathOfFile4 = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Ma
 
 int main(){
 	Graph mygraph = DataUtils().importGraphFromAdjList(fromPathOfFile2);
+	Algorithm().getConnectedComponentWithBFS(mygraph);
 
-
-	
 	system("PAUSE");
 	return 0;
 }

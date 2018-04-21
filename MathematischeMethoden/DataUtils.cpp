@@ -35,13 +35,6 @@ void importAllNodesFrom(std::ifstream &importGraph, Graph &targetGraph) {
 	}
 }
 
-Node getFirstNodeFrom(std::string edgeLineInAdjacentList) {	
-	const int INDEX_OF_FIRST_NODE = 0;
-	const int OFF_SET_CHAR_TO_INT = 48;
-	int firstNode = (int)edgeLineInAdjacentList[INDEX_OF_FIRST_NODE] - OFF_SET_CHAR_TO_INT;
-	return Node(firstNode);	
-}
-
 void importAllEdgesFrom(std::ifstream &importGraph, Graph &targetGraph) {
 	std::string edgeLineInAdjacentList;
 
@@ -53,10 +46,18 @@ void importAllEdgesFrom(std::ifstream &importGraph, Graph &targetGraph) {
 	}
 }
 
+Node getFirstNodeFrom(std::string edgeLineInAdjacentList) {	
+	const int START_INDEX_OF_FIRST_NODE = 0;
+	int end_index_of_first_node = edgeLineInAdjacentList.find("\t");
+	int firstNode = stoi(edgeLineInAdjacentList.substr(START_INDEX_OF_FIRST_NODE, end_index_of_first_node));
+	return Node(firstNode);	
+}
+
 Node getSecondNodeFrom(std::string edgeLineInAdjacentList) {
-	const int INDEX_OF_SECOND_NODE = 2;
-	const int OFF_SET_CHAR_TO_INT = 48;
-	int secondNode = (int)edgeLineInAdjacentList[INDEX_OF_SECOND_NODE] - OFF_SET_CHAR_TO_INT;
+	const int OFFSET_BEGINN_AFTER_TAB = 1;
+	int start_index_of_second_node = edgeLineInAdjacentList.find("\t") + OFFSET_BEGINN_AFTER_TAB;
+	int end_index_of_second_node = edgeLineInAdjacentList.find("\n");
+	int secondNode = stoi(edgeLineInAdjacentList.substr(start_index_of_second_node, end_index_of_second_node));
 	return Node(secondNode);
 }
 

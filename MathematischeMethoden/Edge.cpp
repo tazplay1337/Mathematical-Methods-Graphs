@@ -16,3 +16,11 @@ Node Edge::getNodeV1() {
 Node Edge::getNodeV2() {
 	return this->nodeV2;
 }
+
+int Edge::getNodeV1ID() {
+	return this->nodeV1.getID();
+}
+
+int Edge::getNodeV2ID() {
+	return this->nodeV2.getID();
+}

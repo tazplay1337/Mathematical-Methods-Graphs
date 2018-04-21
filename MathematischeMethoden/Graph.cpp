@@ -32,10 +32,22 @@ Node Graph::getNode(int id) {
 }
 
 std::vector<int> Graph::getNeighboursID(Node node) {
+	std::vector<int> neighbours;
+	Edge edge;
 
+	for (size_t i = 0; i < edges.size(); i++) {
+		edge = edges[i];
+		if (edge.getNodeV1ID() == node.getID()) {
+			neighbours.push_back(edge.getNodeV2ID());
+		}
+		else if (edge.getNodeV2ID() == node.getID()) {
+			neighbours.push_back(edge.getNodeV1ID());
+		}
+	}
+	return neighbours;
 }
 
 std::unordered_map<int, Node> Graph::getNodes() {
-
+	return this->nodes;
 }
 

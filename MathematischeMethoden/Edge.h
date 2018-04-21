@@ -9,4 +9,6 @@ public:
 	Edge(Node nodeV1, Node nodeV2);
 	Node getNodeV1();
 	Node getNodeV2();
+	int getNodeV1ID();
+	int getNodeV2ID();
 };
