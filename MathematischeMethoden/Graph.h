@@ -7,11 +7,13 @@
 
 class Graph{
 private:
-	std::vector<Edge> allEdgesOfG;
-	std::unordered_map<int, Node> allNodesOfG;
+	std::vector<Edge> edges;
+	std::unordered_map<int, Node> nodes;
 public:
 	Graph();
 	~Graph();
+	bool isEmpty();
 	void insertNode(Node newNode);
 	void insertEdge(Edge newEdge);
+	Node getNode(int id);
 };

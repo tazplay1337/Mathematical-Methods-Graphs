@@ -27,10 +27,10 @@
     <ClCompile Include="Algorithm.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="DataManagement.cpp">
+    <ClCompile Include="Edge.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Edge.cpp">
+    <ClCompile Include="DataUtils.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,10 +44,10 @@
     <ClInclude Include="Algorithm.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="DataManagement.h">
+    <ClInclude Include="Edge.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Edge.h">
+    <ClInclude Include="DataUtils.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
