@@ -16,6 +16,7 @@ Node getSecondNodeFrom(std::string edgeLineInAdjacentList);
 Graph DataUtils::importGraphFromAdjList(std::string fromPathOfFile) {
 	std::ifstream importGraph(fromPathOfFile);
 	Graph graph = Graph();
+
 	if (importGraph) {
 		importAllNodesFrom(importGraph, graph);
 		importAllEdgesFrom(importGraph, graph);
@@ -23,14 +24,14 @@ Graph DataUtils::importGraphFromAdjList(std::string fromPathOfFile) {
 	return graph;
 }
 
-void importAllNodesFrom(std::ifstream &importGraph, Graph &intoGraph) {
+void importAllNodesFrom(std::ifstream &importGraph, Graph &targetGraph) {
 	std::string numOfAllNodesFromImportG;
 	std::string edgeLineInAdjacentList;
 	getline(importGraph, numOfAllNodesFromImportG);
 
 	for (int id = 0; id < std::stoi(numOfAllNodesFromImportG); id++) {
 		Node newNode = Node(id);
-		intoGraph.insertNode(newNode);
+		targetGraph.insertNode(newNode);
 	}
 }
 
@@ -41,13 +42,14 @@ Node getFirstNodeFrom(std::string edgeLineInAdjacentList) {
 	return Node(firstNode);	
 }
 
-void importAllEdgesFrom(std::ifstream &importGraph, Graph &intoGraph) {
+void importAllEdgesFrom(std::ifstream &importGraph, Graph &targetGraph) {
 	std::string edgeLineInAdjacentList;
+
 	while (getline(importGraph, edgeLineInAdjacentList)) {
 		Node firstNode = getFirstNodeFrom(edgeLineInAdjacentList);
 		Node SecondNode = getSecondNodeFrom(edgeLineInAdjacentList);
 		Edge newEdge = Edge(firstNode.getID(), SecondNode.getID());
-		intoGraph.insertEdge(newEdge);
+		targetGraph.insertEdge(newEdge);
 	}
 }
 
@@ -59,6 +61,7 @@ Node getSecondNodeFrom(std::string edgeLineInAdjacentList) {
 }
 
 Graph DataUtils::importGraphFromAdjMatrix(std::string fromPathOfFile) {
+	// TODO
 	return Graph();
 }
 

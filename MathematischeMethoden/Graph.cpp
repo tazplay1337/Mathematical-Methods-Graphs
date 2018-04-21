@@ -23,8 +23,11 @@ bool Graph::isEmpty() {
 }
 
 Node Graph::getNode(int id) {
-	//if (Knoten noch nicht da) TODO
-	Node node = this->nodes.find(id);
-	return node;
+	if (nodes.find(id) == nodes.end()){
+		return NULL;
+	}
+	else{
+		return nodes[id];
+	}
 }
 

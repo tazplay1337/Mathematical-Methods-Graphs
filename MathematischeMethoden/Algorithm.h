@@ -1,9 +1,10 @@
 #pragma once
 #include "Graph.h"
+#include <queue>
 class Algorithm {
 private:
-	std::vector<Edge> breadthFirstSearch(std::vector<Node> &L1, std::vector<Node> &L2, std::vector<Edge> &E0);
-	std::vector<Edge> depthFirstSearch();
+	static std::vector<Edge> breadthFirstSearch(Graph graph, std::queue<Node> &L1, std::queue<Node> &L2, std::vector<Edge> &E0);
+	static std::vector<Edge> depthFirstSearch();
 
 public:
 	Algorithm();
