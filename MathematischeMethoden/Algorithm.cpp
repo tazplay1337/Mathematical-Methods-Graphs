@@ -70,7 +70,7 @@ void Algorithm::breadthFirstSearch(Graph graph, Graph &connectedComponent, std::
 			unprocessedNodes.push(unvisitedNode);
 			connectedComponent.addNode(unvisitedNode);
 			Edge newEdge = Edge(currentNode, unvisitedNode);
-			connectedComponent.addEdge(newEdge);
+			connectedComponent.addEdge(currentNode.getID(), unvisitedNode.getID());
 		}
 	}
 }

@@ -13,10 +13,12 @@ const string fromPathOfFile3 = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Ma
 const string fromPathOfFile4 = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Graph4.txt";
 
 int main() {
-	Graph mygraph = DataUtils().importGraphFromAdjList(fromPathOfFile3);
-	std::vector<Graph> conComponentBFS = Algorithm().getConnectedComponentWithBFS(mygraph);
+	Graph mygraph = DataUtils().importGraphFromAdjList(fromPathOfFile2);
+//	std::vector<Graph> conComponentBFS = Algorithm().getConnectedComponentWithBFS(mygraph);
 
-	cout << "Der Graph besteht aus " << conComponentBFS.size() << " Spannbäumen." << endl;
+//	cout << "Der Graph besteht aus " << conComponentBFS.size() << " Spannbäumen." << endl;
+
+
 
 	system("PAUSE");
 	return 0;

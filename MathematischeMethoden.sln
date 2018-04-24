@@ -5,9 +5,9 @@ VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MathematischeMethoden", "MathematischeMethoden\MathematischeMethoden.vcxproj", "{EF86C674-5BC5-4F76-8FBA-099429897AAE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Aufgabe 4", "..\..\..\02 Semester\ADS\Ads Programme C++\Praktikum 2 A3 A4\Aufgabe 4 Baum\Aufgabe 4.vcxproj", "{68718763-7744-46C2-8091-994954555959}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Praktikum A8-11", "..\..\..\02 Semester\ADS\Ads Programme C++\Praktikum 5 A8 A9-13\Praktikum A8-11\Praktikum A8-11.vcxproj", "{BB237D56-9690-426E-887E-F34A4F1053F7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandkasten", "Sandkasten\Sandkasten.vcxproj", "{44749D7B-4B49-450C-BAC6-671EB3ED327E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,18 +25,20 @@ Global
 		{EF86C674-5BC5-4F76-8FBA-099429897AAE}.Release|x64.Build.0 = Release|x64
 		{EF86C674-5BC5-4F76-8FBA-099429897AAE}.Release|x86.ActiveCfg = Release|Win32
 		{EF86C674-5BC5-4F76-8FBA-099429897AAE}.Release|x86.Build.0 = Release|Win32
-		{68718763-7744-46C2-8091-994954555959}.Debug|x64.ActiveCfg = Debug|Win32
-		{68718763-7744-46C2-8091-994954555959}.Debug|x86.ActiveCfg = Debug|Win32
-		{68718763-7744-46C2-8091-994954555959}.Debug|x86.Build.0 = Debug|Win32
-		{68718763-7744-46C2-8091-994954555959}.Release|x64.ActiveCfg = Release|Win32
-		{68718763-7744-46C2-8091-994954555959}.Release|x86.ActiveCfg = Release|Win32
-		{68718763-7744-46C2-8091-994954555959}.Release|x86.Build.0 = Release|Win32
 		{BB237D56-9690-426E-887E-F34A4F1053F7}.Debug|x64.ActiveCfg = Debug|Win32
 		{BB237D56-9690-426E-887E-F34A4F1053F7}.Debug|x86.ActiveCfg = Debug|Win32
 		{BB237D56-9690-426E-887E-F34A4F1053F7}.Debug|x86.Build.0 = Debug|Win32
 		{BB237D56-9690-426E-887E-F34A4F1053F7}.Release|x64.ActiveCfg = Release|Win32
 		{BB237D56-9690-426E-887E-F34A4F1053F7}.Release|x86.ActiveCfg = Release|Win32
 		{BB237D56-9690-426E-887E-F34A4F1053F7}.Release|x86.Build.0 = Release|Win32
+		{44749D7B-4B49-450C-BAC6-671EB3ED327E}.Debug|x64.ActiveCfg = Debug|x64
+		{44749D7B-4B49-450C-BAC6-671EB3ED327E}.Debug|x64.Build.0 = Debug|x64
+		{44749D7B-4B49-450C-BAC6-671EB3ED327E}.Debug|x86.ActiveCfg = Debug|Win32
+		{44749D7B-4B49-450C-BAC6-671EB3ED327E}.Debug|x86.Build.0 = Debug|Win32
+		{44749D7B-4B49-450C-BAC6-671EB3ED327E}.Release|x64.ActiveCfg = Release|x64
+		{44749D7B-4B49-450C-BAC6-671EB3ED327E}.Release|x64.Build.0 = Release|x64
+		{44749D7B-4B49-450C-BAC6-671EB3ED327E}.Release|x86.ActiveCfg = Release|Win32
+		{44749D7B-4B49-450C-BAC6-671EB3ED327E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
