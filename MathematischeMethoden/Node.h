@@ -4,6 +4,7 @@ public:
 	Node();
 	Node(int id);
 	int getID();
+	Edge
 private:
 	int id;
 };

@@ -8,6 +8,5 @@ private:
 public:
 	Algorithm();
 	static std::vector<Graph> getConnectedComponentWithBFS(Graph &graph);
-	static std::vector<Graph> getConnectedComponentWithDFS(Graph &
-		graph);
+	static std::vector<Graph> getConnectedComponentWithDFS(Graph &graph);
 };

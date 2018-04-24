@@ -8,6 +8,7 @@
 class Graph{
 private:
 	std::vector<Edge> edges;
+	//List<List<
 	std::unordered_map<int, Node> nodes; 								
 public:
 	Graph();

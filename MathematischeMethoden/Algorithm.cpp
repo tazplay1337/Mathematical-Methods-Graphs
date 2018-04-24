@@ -7,9 +7,9 @@ Algorithm::Algorithm() {};
 int totalNodesSize(std::vector<Graph> &graphs);
 int findUnvisitedNodeID(std::vector<Graph> &graphs, Graph &graph);
 
-std::vector<Graph> Algorithm::getConnectedComponentWithBFS(Graph graph) {
+std::vector<Graph> Algorithm::getConnectedComponentWithBFS(Graph &graph) {
 	std::vector<Graph> connectedComponentsOfGraph;
-	Graph connectedComponent;
+//	Graph connectedComponent;
 	std::queue<Node> unprocessedNodes;
 	Node startNode;
 	int unvisitedNode = 0;
@@ -22,7 +22,6 @@ std::vector<Graph> Algorithm::getConnectedComponentWithBFS(Graph graph) {
 		connectedComponent.addNode(startNode);
 		breadthFirstSearch(graph, connectedComponent, unprocessedNodes);
 		connectedComponentsOfGraph.push_back(connectedComponent);
-
 	}
 	return connectedComponentsOfGraph;
 }
@@ -57,7 +56,7 @@ bool unvisitedNeighboursExist(std::unordered_map<int, Node> &visitedNodes, std::
 int getUnvisitedNeighbourID(std::unordered_map<int, Node> &visitedNodes, std::vector<int> &neighboursOfcurrentNode);
 
 void Algorithm::breadthFirstSearch(Graph graph, Graph &connectedComponent, std::queue<Node> &unprocessedNodes) {
-	if (!unprocessedNodes.empty()) {
+	while (!unprocessedNodes.empty()) {
 		Node currentNode = unprocessedNodes.front();
 		std::vector<int> neighboursIDsOfcurrentNode = graph.getNeighboursID(currentNode);
 		std::unordered_map<int, Node> visitedNodes = connectedComponent.getNodes();
@@ -73,7 +72,6 @@ void Algorithm::breadthFirstSearch(Graph graph, Graph &connectedComponent, std::
 			Edge newEdge = Edge(currentNode, unvisitedNode);
 			connectedComponent.addEdge(newEdge);
 		}
-		breadthFirstSearch(graph, connectedComponent, unprocessedNodes);
 	}
 }
 
