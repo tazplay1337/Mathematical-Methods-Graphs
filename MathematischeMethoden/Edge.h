@@ -4,6 +4,8 @@ class Edge {
 private:
 	Node nodeV1;
 	Node nodeV2;
+	bool hasWeigt;
+	double weight;
 public:	
 	Edge();
 	Edge(Node nodeV1, Node nodeV2);

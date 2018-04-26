@@ -27,6 +27,11 @@ void Graph::addEdge(int nodeID1, int nodeID2) {
 	}
 }
 
+void Graph::updateNeighbour(int firstNodeID, int secondNodeID) {
+	this->nodes[firstNodeID].pushNeigbourID(secondNodeID);
+	this->nodes[secondNodeID].pushNeigbourID(firstNodeID);	// TODO: If Graph ungerichtet else nicht
+}
+
 std::string createEdgeIndex(int nodeID1, int nodeID2) {
 	bool isnodeID1LowerNodeID2 = nodeID1<nodeID2 ? true : false;
 	std::string index;
@@ -56,7 +61,7 @@ Node Graph::getNode(int id) {
 	}
 }
 
-bool Graph::containNode(int id) {
+bool Graph::nodeExist(int id) {
 	bool nodeNotExist = nodes.find(id) == nodes.end();
 
 	if (nodeNotExist) {
@@ -67,20 +72,9 @@ bool Graph::containNode(int id) {
 	}
 }
 
-std::vector<int> Graph::getNeighboursID(Node node) {
-	std::vector<int> neighbours;
-/*	Edge edge;
-
-	for (size_t i = 0; i < edges.size(); i++) {
-		edge = edges[i];
-		if (edge.getNodeV1ID() == node.getID()) {
-			neighbours.push_back(edge.getNodeV2ID());
-		}
-		else if (edge.getNodeV2ID() == node.getID()) {
-			neighbours.push_back(edge.getNodeV1ID());
-		}
-	} */
-	return neighbours;
+std::vector<int> Graph::getNeighboursID(int nodeID) {
+	Node node = this->nodes[nodeID];
+	return node.getNeigbourIDs(node.getID());
 }
 
 std::unordered_map<int, Node> Graph::getNodes() {
