@@ -36,33 +36,73 @@ void importAllNodes(std::ifstream &importGraph, Graph &targetGraph) {
 
 int getFirstNodeIDFromAdjList(std::string &edgeLineInAdjacentList);
 int getSecondNodeIDFromAdjList(std::string &edgeLineInAdjacentList);
+bool setWeightIfExist(std::string &edgeLineInAdjacentList, double &weight);
 
 void importAllEdgesFromAdjList(std::ifstream &importGraph, Graph &targetGraph) {
-	int firstNodeID;
-	int SecondNodeID;
+	int firstNodeID = 0;
+	int SecondNodeID = 0;
+	bool isWeight = false;
+	double weight = 0;
+
 	std::string edgeLineInAdjacentList;
 
 	while (getline(importGraph, edgeLineInAdjacentList)) {
 		firstNodeID = getFirstNodeIDFromAdjList(edgeLineInAdjacentList);
 		SecondNodeID = getSecondNodeIDFromAdjList(edgeLineInAdjacentList);
-		targetGraph.addEdge(firstNodeID, SecondNodeID);
-		targetGraph.updateNeighbour(firstNodeID, SecondNodeID);
+		isWeight = setWeightIfExist(edgeLineInAdjacentList, weight);
+
+		if (isWeight) {
+			targetGraph.addEdge(firstNodeID, SecondNodeID, weight);
+			targetGraph.updateNeighbour(firstNodeID, SecondNodeID);
+		}
+		else {
+			targetGraph.addEdge(firstNodeID, SecondNodeID);
+			targetGraph.updateNeighbour(firstNodeID, SecondNodeID);
+		}
+		
 	}
 }
 
 int getFirstNodeIDFromAdjList(std::string &edgeLineInAdjacentList) {
-	const int START_INDEX_OF_FIRST_NODE = 0;
+	const int cStartIndexOfFirstNode = 0;
 	int end_index_of_first_node = edgeLineInAdjacentList.find("\t");
-	int firstNode = stoi(edgeLineInAdjacentList.substr(START_INDEX_OF_FIRST_NODE, end_index_of_first_node));
+	int firstNode = stoi(edgeLineInAdjacentList.substr(cStartIndexOfFirstNode, end_index_of_first_node));
 	return firstNode;	
 }
 
 int getSecondNodeIDFromAdjList(std::string &edgeLineInAdjacentList) {
-	const int OFFSET_BEGINN_AFTER_TAB = 1;
-	int start_index_of_second_node = edgeLineInAdjacentList.find("\t") + OFFSET_BEGINN_AFTER_TAB;
+	const int cOffsetBeginnAfterTab = 1;
+	int start_index_of_second_node = edgeLineInAdjacentList.find("\t") + cOffsetBeginnAfterTab;
 	int end_index_of_second_node = edgeLineInAdjacentList.find("\n");
 	int secondNodeID = stoi(edgeLineInAdjacentList.substr(start_index_of_second_node, end_index_of_second_node));
 	return secondNodeID;
+}
+
+int findSecondTab(std::string &edgeLineInAdjacentList);
+
+bool setWeightIfExist(std::string &edgeLineInAdjacentList, double &weight) {
+	const int cOffsetBeginnAfterTab = 1;
+	int indexOfSecondTab = findSecondTab(edgeLineInAdjacentList);
+	bool weightExist = false;
+
+	if (indexOfSecondTab != std::string::npos) {
+		int startIndexOfWeight = indexOfSecondTab + cOffsetBeginnAfterTab;
+		int endIndexOfWeight = edgeLineInAdjacentList.size() - 1;
+		weight = stod(edgeLineInAdjacentList.substr(startIndexOfWeight, endIndexOfWeight));
+		weightExist = true;
+	}
+	return weightExist;
+}
+
+int findSecondTab(std::string &edgeLineInAdjacentList) {
+	const int cOffsetBeginnAfterTab = 1;
+	size_t firstTab = edgeLineInAdjacentList.find("\t");
+	size_t secondTab = std::string::npos;
+
+	if (firstTab != std::string::npos) {
+		secondTab = edgeLineInAdjacentList.find("\t", firstTab + cOffsetBeginnAfterTab);
+	}
+	return secondTab;
 }
 
 void importAllEdgesFromAdjMatrix(std::ifstream &importGraph, Graph &intoGraph);
@@ -81,8 +121,7 @@ Graph DataUtils::importGraphFromAdjMatrix(std::string fromPathOfFile) {
 void removeTabs(std::string &line);
 
 void importAllEdgesFromAdjMatrix(std::ifstream &importGraph, Graph &targetGraph) {
-	const char IS_EDGE = '1';
-	const int NEXT = 1;
+	const char cIsEdge = '1';
 	int firstNodeID = 0;
 	int SecondNodeID = 0;
 	std::string edgeLineInAdjacentList;
@@ -91,12 +130,12 @@ void importAllEdgesFromAdjMatrix(std::ifstream &importGraph, Graph &targetGraph)
 		removeTabs(edgeLineInAdjacentList);
 
 		for (size_t SecondNodeID = firstNodeID; SecondNodeID < edgeLineInAdjacentList.length(); SecondNodeID++) {
-			if (edgeLineInAdjacentList[SecondNodeID] == IS_EDGE) {
+			if (edgeLineInAdjacentList[SecondNodeID] == cIsEdge) {
 				targetGraph.addEdge(firstNodeID, SecondNodeID);
 				targetGraph.updateNeighbour(firstNodeID, SecondNodeID);
 			}
 		}
-		firstNodeID += NEXT;
+		firstNodeID += 1;
 	}
 }
 

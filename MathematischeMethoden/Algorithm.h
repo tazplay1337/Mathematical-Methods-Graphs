@@ -9,4 +9,7 @@ public:
 	Algorithm();
 	static std::vector<Graph> getConnectedComponentWithBFS(Graph &graph);
 	static int getConnectedComponentWithDFS(Graph &graph);
+	static Graph getPrimMinimumSpanningTree(Graph &graph);
+	static double getKruskalMinimumSpanningTree(Graph &graph);
+	static void test(Graph &graph);
 };

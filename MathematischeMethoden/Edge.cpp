@@ -2,25 +2,43 @@
 #include "Edge.h"
 #include "Node.h"
 
-Edge::Edge() {}
-
-Edge::Edge(Node nodeV1, Node nodeV2) {
-	this->nodeV1 = Node(nodeV1.getID());
-	this->nodeV2 = Node(nodeV2.getID());
+Edge::Edge() {
+	const int cMyNULL = -99999;
+	this->beInExistence = false;
+	this->nodeIDV1 = cMyNULL;
+	this->nodeIDV2 = cMyNULL;
+	this->hasWeigt = false;
+	this->weight = cMyNULL;
 }
 
-Node Edge::getNodeV1() {
-	return this->nodeV1;
+Edge::Edge(int nodeIDV1, int nodeIDV2) {
+	this->beInExistence = true;
+	this->hasWeigt = false;
+	this->nodeIDV1 = nodeIDV1;
+	this->nodeIDV2 = nodeIDV2;
+	this->weight = 0;
 }
 
-Node Edge::getNodeV2() {
-	return this->nodeV2;
+Edge::Edge(int nodeIDV1, int nodeIDV2, double weight) {
+	this->beInExistence = true;
+	this->nodeIDV1 = nodeIDV1;
+	this->nodeIDV2 = nodeIDV2;
+	this->hasWeigt = true;
+	this->weight = weight;
 }
 
-int Edge::getNodeV1ID() {
-	return this->nodeV1.getID();
+int Edge::getNodeIDV1() {
+	return this->nodeIDV1;
 }
 
-int Edge::getNodeV2ID() {
-	return this->nodeV2.getID();
+int Edge::getNodeIDV2() {
+	return this->nodeIDV2;
+}
+
+double Edge::getWeight() {
+	return this->weight;
+}
+
+bool Edge::exist() {
+	return this->beInExistence;
 }

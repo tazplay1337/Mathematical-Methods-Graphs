@@ -6,7 +6,7 @@ public:
 	Node();
 	Node(int id);
 	int getID();
-	std::vector<int> getNeigbourIDs(int neigbourID);
+	std::vector<int> getNeigbourIDs();
 	void pushNeigbourID(int neigbourID);
 private:
 	int id;

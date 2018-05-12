@@ -1,8 +1,18 @@
 #pragma once
 #include "Algorithm.h"
+#include "DisjointSets.h"
 #include <iostream>
+#include <utility>
+#include <queue>
 
 Algorithm::Algorithm() {};
+
+class compareEdges {
+public:
+	double operator() (Edge& p1, Edge& p2) {
+		return p1.getWeight() > p2.getWeight();
+	}
+};
 
 int totalNodesSize(std::vector<Graph> &graphs);
 int findUnvisitedNodeID(std::vector<bool> &visitedNodes);
@@ -11,12 +21,12 @@ void setVisitedNodes(std::vector<bool> &visitedNodes, Graph &graph);
 std::vector<Graph> Algorithm::getConnectedComponentWithBFS(Graph &graph) {
 	Graph connectedComponent;
 	std::vector<Graph> connectedComponentsOfGraph;
-	int sizeGraph = graph.nodesSize();
+	int sizeGraph = graph.sizeNodes();
 	int unvisitedNodeID = 0;
 	std::vector<bool> visitedNodes(sizeGraph, false);
 
 	while (totalNodesSize(connectedComponentsOfGraph) < sizeGraph) {
-		unvisitedNodeID = findUnvisitedNodeID(visitedNodes);
+		unvisitedNodeID = findUnvisitedNodeID(visitedNodes); //starte vom letzten gefundenen
 		connectedComponent = breadthFirstSearch(graph, unvisitedNodeID);
 		connectedComponentsOfGraph.push_back(connectedComponent);
 		setVisitedNodes(visitedNodes, connectedComponent);
@@ -28,7 +38,7 @@ int totalNodesSize(std::vector<Graph> &graphs) {
 	int totalSize = 0;
 
 	for (size_t i = 0; i < graphs.size(); i++) {
-		totalSize += graphs[i].nodesSize();
+		totalSize += graphs[i].sizeNodes();
 	}
 	return totalSize;
 }
@@ -85,17 +95,16 @@ Graph Algorithm::breadthFirstSearch(Graph &graph, int startNodeID) {
 }
 
 int Algorithm::getConnectedComponentWithDFS(Graph &graph) {
-	const int ALL_NODES_VISITED = -1;
-	const int FOUND_COMPONENT = 1;
+	const int cAllNodesVisited = -1;
 	int counterConnectedComponent = 0;
-	int sizeGraph = graph.nodesSize();
+	int sizeGraph = graph.sizeNodes();
 	int unvisitedNodeID = 0;
-	std::vector<bool> visitedNodesOfGraph(sizeGraph, false);
+	std::vector<bool> visitedNodesOfGraph(sizeGraph, false); //nodesVisited
 
-	while (ALL_NODES_VISITED < unvisitedNodeID) {
+	while (cAllNodesVisited < unvisitedNodeID) { //besser: for i = letzter unbesuchter Knooten)
 		depthFirstSearch(graph, unvisitedNodeID, visitedNodesOfGraph);
 		unvisitedNodeID = findUnvisitedNodeID(visitedNodesOfGraph);
-		counterConnectedComponent += FOUND_COMPONENT;
+		counterConnectedComponent += 1;
 	}
 	return counterConnectedComponent;
 }
@@ -114,3 +123,116 @@ void Algorithm::depthFirstSearch(Graph &graph, int nodeID, std::vector<bool> &vi
 		}
 	}
 }
+
+void pushEdgesInPQ(std::priority_queue<Edge, std::vector<Edge>, compareEdges> &candidateEdges, std::vector<Edge> &edges);
+Edge poplowestCostEdge(std::priority_queue<Edge, std::vector<Edge>, compareEdges> &candidateEdges);
+std::vector<Edge> findCandidateEdges(Node &currentNode, Graph &graph, Graph &mst);
+
+
+Graph Algorithm::getPrimMinimumSpanningTree(Graph &graph) {
+	Graph mst = Graph();
+	std::priority_queue<Edge, std::vector<Edge>, compareEdges> candidateEdges;
+	std::vector<Edge> candidates;
+	int sizeGraph = graph.sizeNodes();
+	Edge lowestCostEdge;
+	Node newNode = graph.getNode(0);
+
+	mst.addNode(newNode.getID());
+	candidates = graph.getNodeEdges(newNode.getID());
+	pushEdgesInPQ(candidateEdges, candidates);
+
+	while (mst.sizeNodes() < sizeGraph) {
+		lowestCostEdge = poplowestCostEdge(candidateEdges);
+
+		if (!mst.nodeExist(lowestCostEdge.getNodeIDV1()) || !mst.nodeExist(lowestCostEdge.getNodeIDV2())) {
+			newNode = !mst.nodeExist(lowestCostEdge.getNodeIDV1()) ? Node(lowestCostEdge.getNodeIDV1()) : Node(lowestCostEdge.getNodeIDV2());
+			mst.addNode(newNode);
+			mst.addEdge(lowestCostEdge.getNodeIDV1(), lowestCostEdge.getNodeIDV2(), lowestCostEdge.getWeight());
+			mst.updateNeighbour(lowestCostEdge.getNodeIDV1(), lowestCostEdge.getNodeIDV2());
+			candidates = findCandidateEdges(newNode, graph, mst);
+			pushEdgesInPQ(candidateEdges, candidates);
+		}
+	}
+	return mst;
+}
+
+void pushEdgesInPQ(std::priority_queue<Edge, std::vector<Edge>, compareEdges> &candidateEdges, std::vector<Edge> &edges) {
+	for (int i = 0; i < edges.size(); i++) {
+		candidateEdges.push(edges[i]);
+	}
+}
+
+Edge poplowestCostEdge(std::priority_queue<Edge, std::vector<Edge>, compareEdges> &candidateEdges) {
+	Edge lowestCostEdge = candidateEdges.top();
+	candidateEdges.pop();
+	return lowestCostEdge;
+}
+
+std::vector<Edge> findCandidateEdges(Node &node, Graph &graph, Graph &mst) {
+	std::vector<Edge> allEdges = graph.getNodeEdges(node.getID());
+	std::vector<Edge> candidate;
+	Edge edge;
+
+	for (int i = 0; i < allEdges.size(); i++) {
+		edge = allEdges[i];
+		if (!mst.nodeExist(edge.getNodeIDV1()) || !mst.nodeExist(edge.getNodeIDV2())) {
+			candidate.push_back(edge);
+		}
+	}
+	return candidate;
+}
+
+bool isSelectedEdgeCreatingCycle(int set_u, int set_v);
+
+double Algorithm::getKruskalMinimumSpanningTree(Graph &graph) {
+	double mstCosts = 0;
+	DisjointSets disjointSets(graph.sizeNodes());
+	std::vector<std::pair<double, Edge>> edges;
+	Edge edge;
+	
+	sort(edges.begin(), edges.end()); // Sort edges in increasing order on basis of cost
+
+	for (int i = 0; i < edges.size(); i++) {
+		edge = edges[i].second;
+		int nodeIDV1 = edge.getNodeIDV1();
+		int nodeIDV2 = edge.getNodeIDV2();
+
+		int set_node1 = disjointSets.findParentOf(nodeIDV1);
+		int set_node2 = disjointSets.findParentOf(nodeIDV2);
+
+		if (isSelectedEdgeCreatingCycle(set_node1, set_node2)) {
+			mstCosts += edges[i].first; // Update MST weight
+			disjointSets.mergeTreesLowerToHigher(set_node1, set_node2);
+		}
+	}
+	return mstCosts;
+}
+
+bool isSelectedEdgeCreatingCycle(int set_u, int set_v) {
+	return set_u != set_v;
+}
+
+void  Algorithm::test(Graph &graph) {
+	std::priority_queue <Edge, std::vector<Edge>, compareEdges > pq;
+
+	Edge edge1 = Edge(1, 2, 0.555);
+	Edge edge2 = Edge(1, 3, 0.111);
+	Edge edge3 = Edge(2, 4, 0.123);
+	Edge edge4 = Edge(3, 4, 0.888);
+
+	pq.push(edge1);
+	pq.push(edge2);
+	pq.push(edge3);
+	pq.push(edge4);
+
+	// One by one extract items from min heap
+	while (pq.empty() == false){
+		Edge edge = pq.top();
+		std::cout << "Weight is : " << edge.getWeight() << " from Node: " << edge.getNodeIDV1() << " to Node: " << edge.getNodeIDV2() << std::endl;
+		std::cout << std::endl;
+		pq.pop();
+	}
+}
+
+
+

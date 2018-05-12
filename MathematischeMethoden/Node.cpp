@@ -25,6 +25,6 @@ void Node::pushNeigbourID(int newNeigbourID) {
 	}
 }
 
-std::vector<int> Node::getNeigbourIDs(int neigbourID) {
+std::vector<int> Node::getNeigbourIDs() {
 	return this->neigbourIDs;
 }

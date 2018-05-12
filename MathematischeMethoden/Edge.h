@@ -2,15 +2,18 @@
 #include "Node.h"
 class Edge {
 private:
-	Node nodeV1;
-	Node nodeV2;
-	bool hasWeigt;
+	int nodeIDV1;
+	int nodeIDV2;
 	double weight;
+	bool hasWeigt;
+	bool beInExistence;
+	
 public:	
 	Edge();
-	Edge(Node nodeV1, Node nodeV2);
-	Node getNodeV1();
-	Node getNodeV2();
-	int getNodeV1ID();
-	int getNodeV2ID();
+	Edge(int nodeIDV1, int nodeIDV2);
+	Edge(int nodeIDV1, int nodeIDV2, double weight);
+	int getNodeIDV1();
+	int getNodeIDV2();
+	double getWeight();
+	bool exist();
 };
