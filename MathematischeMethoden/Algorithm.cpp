@@ -7,13 +7,6 @@
 
 Algorithm::Algorithm() {};
 
-class compareEdges {
-public:
-	double operator() (Edge& p1, Edge& p2) {
-		return p1.getWeight() > p2.getWeight();
-	}
-};
-
 int totalNodesSize(std::vector<Graph> &graphs);
 int findUnvisitedNodeID(std::vector<bool> &visitedNodes);
 void setVisitedNodes(std::vector<bool> &visitedNodes, Graph &graph);
@@ -124,10 +117,16 @@ void Algorithm::depthFirstSearch(Graph &graph, int nodeID, std::vector<bool> &vi
 	}
 }
 
+class compareEdges {
+public:
+	double operator() (Edge& p1, Edge& p2) {
+		return p1.getWeight() > p2.getWeight();
+	}
+};
+
 void pushEdgesInPQ(std::priority_queue<Edge, std::vector<Edge>, compareEdges> &candidateEdges, std::vector<Edge> &edges);
 Edge poplowestCostEdge(std::priority_queue<Edge, std::vector<Edge>, compareEdges> &candidateEdges);
 std::vector<Edge> findCandidateEdges(Node &currentNode, Graph &graph, Graph &mst);
-
 
 Graph Algorithm::getPrimMinimumSpanningTree(Graph &graph) {
 	Graph mst = Graph();
@@ -182,18 +181,23 @@ std::vector<Edge> findCandidateEdges(Node &node, Graph &graph, Graph &mst) {
 	return candidate;
 }
 
+bool your_comparer(Edge left, Edge right) {
+	return left.getWeight() < right.getWeight();
+}
+
 bool isSelectedEdgeCreatingCycle(int set_u, int set_v);
 
 double Algorithm::getKruskalMinimumSpanningTree(Graph &graph) {
 	double mstCosts = 0;
 	DisjointSets disjointSets(graph.sizeNodes());
-	std::vector<std::pair<double, Edge>> edges;
+	std::vector<Edge> edges;
 	Edge edge;
-	
-	sort(edges.begin(), edges.end()); // Sort edges in increasing order on basis of cost
 
+	graph.copyEdgesInVector(edges);
+	std::sort(edges.begin(), edges.end(), your_comparer);
+	
 	for (int i = 0; i < edges.size(); i++) {
-		edge = edges[i].second;
+		edge = edges[i];
 		int nodeIDV1 = edge.getNodeIDV1();
 		int nodeIDV2 = edge.getNodeIDV2();
 
@@ -201,7 +205,7 @@ double Algorithm::getKruskalMinimumSpanningTree(Graph &graph) {
 		int set_node2 = disjointSets.findParentOf(nodeIDV2);
 
 		if (isSelectedEdgeCreatingCycle(set_node1, set_node2)) {
-			mstCosts += edges[i].first; // Update MST weight
+			mstCosts += edges[i].getWeight(); // Update MST weight
 			disjointSets.mergeTreesLowerToHigher(set_node1, set_node2);
 		}
 	}
@@ -213,25 +217,11 @@ bool isSelectedEdgeCreatingCycle(int set_u, int set_v) {
 }
 
 void  Algorithm::test(Graph &graph) {
-	std::priority_queue <Edge, std::vector<Edge>, compareEdges > pq;
+	std::vector<Edge> edges;
+	graph.copyEdgesInVector(edges);
+	std::sort(edges.begin(), edges.end(), your_comparer);
 
-	Edge edge1 = Edge(1, 2, 0.555);
-	Edge edge2 = Edge(1, 3, 0.111);
-	Edge edge3 = Edge(2, 4, 0.123);
-	Edge edge4 = Edge(3, 4, 0.888);
-
-	pq.push(edge1);
-	pq.push(edge2);
-	pq.push(edge3);
-	pq.push(edge4);
-
-	// One by one extract items from min heap
-	while (pq.empty() == false){
-		Edge edge = pq.top();
-		std::cout << "Weight is : " << edge.getWeight() << " from Node: " << edge.getNodeIDV1() << " to Node: " << edge.getNodeIDV2() << std::endl;
-		std::cout << std::endl;
-		pq.pop();
-	}
+	int i = 0;
 }
 
 

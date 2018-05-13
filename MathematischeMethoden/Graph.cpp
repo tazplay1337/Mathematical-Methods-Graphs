@@ -147,7 +147,18 @@ double Graph::totalCost() {
 	return totalCost;
 }
 
-
+void Graph::copyEdgesInVector(std::vector<Edge> &vectorForEdges) {
+//	std::pair<Edge> newWeightedEdge;
+	Edge edge;
+	double weight = 0;
+	
+	for (auto const& p : edges) {
+		edge = p.second;
+//		weight = edge.getWeight();
+//		newWeightedEdge = std::make_pair(weight, edge);
+		vectorForEdges.push_back(edge);
+	}
+}
 
 
 

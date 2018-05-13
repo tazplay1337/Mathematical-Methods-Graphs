@@ -11,6 +11,7 @@ class Graph{
 private:
 	std::unordered_map<std::string, Edge> edges;
 	std::unordered_map<int, Node> nodes;
+//	std::vector<std::pair<double, Edge>> edges;
 //	std::vector< std::pair<int, iPair> > edges;
 public:
 	Graph();
@@ -30,4 +31,7 @@ public:
 	void addEdge(int Node1, int Node2, double weight);
 	double totalCost();
 	void updateNeighbour(int firstNode, int secondNode);
+
+
+	void copyEdgesInVector(std::vector<Edge> &edges);
 };

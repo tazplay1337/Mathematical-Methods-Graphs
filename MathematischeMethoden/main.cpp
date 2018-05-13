@@ -7,20 +7,25 @@
 #include <string>
 #include <time.h>
 
-//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 2\\Beispiel.txt";
+const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 2\\Beispiel.txt";
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 2\\G_1_2.txt";
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 2\\G_1_20.txt";
-const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 2\\G_1_200.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 2\\G_1_200.txt";
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 2\\G_10_20.txt";
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 2\\G_10_200.txt";
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 2\\G_100_200.txt";
 
 int main() {
+	/*
 	clock_t clockStart;
 	clock_t clockEnd;
 	float diffClockStartEnd;
-	float entireTerm;
+	float entireTerm;*/
 
+	Graph mygraph = DataUtils().importGraphFromAdjList(fromPathOfFile);
+	Algorithm().test(mygraph);
+
+	/*
 	clockStart = clock();
 	Graph mygraph = DataUtils().importGraphFromAdjList(fromPathOfFile);
 	clockEnd = clock();
@@ -46,7 +51,7 @@ int main() {
 	diffClockStartEnd = (float)clockEnd - (float)clockStart;
 	entireTerm = diffClockStartEnd / CLOCKS_PER_SEC;
 	std::cout << std::endl << "Time to Calc Totalcost: " << entireTerm << std::endl;
-
+*/
 	system("PAUSE");
 	return 0;
 }
