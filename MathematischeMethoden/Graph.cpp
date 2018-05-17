@@ -38,11 +38,11 @@ void Graph::addEdge(int nodeID1, int nodeID2, double weight) {
 	}
 }
 
-std::string createEdgeIndex(int nodeID1, int nodeID2) {
-	bool isnodeID1LowerNodeID2 = nodeID1 < nodeID2 ? true : false;
+std::string createEdgeIndex(int nodeID1, int nodeID2) { //	int index1 = nodeID1 * size + nodeID2;
+	bool isNodeID1LowerNodeID2 = nodeID1 < nodeID2 ? true : false;
 	std::string index;
 
-	if (isnodeID1LowerNodeID2) {
+	if (isNodeID1LowerNodeID2) {
 		index = std::to_string(nodeID1) + ":" + std::to_string(nodeID2);
 	}
 	else {
@@ -147,15 +147,26 @@ double Graph::totalCost() {
 	return totalCost;
 }
 
+void Graph::printEdges() {
+	Edge edge;
+	int counter = 1;
+
+	for (auto const& p : edges) {
+		edge = p.second;
+		std::cout << "Kante " << counter 
+				  << ": von " << edge.getNodeIDV1() 
+				  << " nach " << edge.getNodeIDV2() 
+				  << " mit Gewicht " << edge.getWeight() << std::endl;
+		counter += 1;
+	}
+}
+
 void Graph::copyEdgesInVector(std::vector<Edge> &vectorForEdges) {
-//	std::pair<Edge> newWeightedEdge;
 	Edge edge;
 	double weight = 0;
 	
 	for (auto const& p : edges) {
 		edge = p.second;
-//		weight = edge.getWeight();
-//		newWeightedEdge = std::make_pair(weight, edge);
 		vectorForEdges.push_back(edge);
 	}
 }

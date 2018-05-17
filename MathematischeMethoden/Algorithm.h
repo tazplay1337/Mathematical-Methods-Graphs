@@ -10,6 +10,8 @@ public:
 	static std::vector<Graph> getConnectedComponentWithBFS(Graph &graph);
 	static int getConnectedComponentWithDFS(Graph &graph);
 	static Graph getPrimMinimumSpanningTree(Graph &graph);
-	static double getKruskalMinimumSpanningTree(Graph &graph);
+	static double getKruskalMinimumSpanningTreeWeight(Graph &graph);
+	static Graph getNearestNeighborHamiltonianPath(Graph &graph, int startNodeID);
+	static Graph getDoubleTreeHamiltonianPath(Graph &graph, int startNodeID);
 	static void test(Graph &graph);
 };

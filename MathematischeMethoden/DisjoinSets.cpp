@@ -7,15 +7,14 @@ DisjointSets::DisjointSets() {
 void initialNodesInDifferentSetsAndParentOfItself(int size, int *parent, int *rank);
 
 DisjointSets::DisjointSets(int size) {
-	const int cOffsetAllocateMemory = 1;
 	this->size = size;
-	this->parent = new int[size + cOffsetAllocateMemory];
-	this->rank = new int[size + cOffsetAllocateMemory];
+	this->parent = new int[size]; // adffgf ToDO
+	this->rank = new int[size];
 	initialNodesInDifferentSetsAndParentOfItself(size, parent, rank);
 }
 
 void initialNodesInDifferentSetsAndParentOfItself(int size, int *parent, int *rank) {
-	for (int i = 0; i <= size; i++){
+	for (int i = 0; i < size; i++){ //TODO
 		rank[i] = 0;
 		parent[i] = i;
 	}

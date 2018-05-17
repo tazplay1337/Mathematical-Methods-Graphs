@@ -31,6 +31,7 @@ public:
 	void addEdge(int Node1, int Node2, double weight);
 	double totalCost();
 	void updateNeighbour(int firstNode, int secondNode);
+	void printEdges();
 
 
 	void copyEdgesInVector(std::vector<Edge> &edges);
