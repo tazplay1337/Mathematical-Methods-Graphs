@@ -4,6 +4,7 @@
 #include <iostream>
 #include <utility>
 #include <queue>
+#include <limits>
 
 Algorithm::Algorithm() {};
 
@@ -102,7 +103,7 @@ int Algorithm::getConnectedComponentWithDFS(Graph &graph) {
 	return counterConnectedComponent;
 }
 
-std::vector<int> order;
+std::vector<int> cOrder;
 
 void Algorithm::depthFirstSearch(Graph &graph, int nodeID, std::vector<bool> &visitedNodes) {
 	int currentNodeID = nodeID;
@@ -115,7 +116,7 @@ void Algorithm::depthFirstSearch(Graph &graph, int nodeID, std::vector<bool> &vi
 
 		if (!visitedNodes[neighbourNode]) {
 			depthFirstSearch(graph, neighbourNode, visitedNodes);
-			order.push_back(neighbourNode);
+			cOrder.push_back(neighbourNode);
 		}
 	}
 }
@@ -237,8 +238,19 @@ Graph Algorithm::getNearestNeighborHamiltonianPath(Graph &graph, int startNodeID
 	neighbor = graph.getNodeEdges(newNode.getID());
 	pushEdgesInPQ(neighborEdges, neighbor);
 
+	// TODO Löschen
+	int counter = 0;
+	std::cout << "getDoubleTreeHamiltonianPath" << std::endl;
+
 	while (hamPath.sizeNodes() < sizeGraph) {
 		lowestCostEdge = poplowestCostEdge(neighborEdges);
+
+		// TODO Löschen
+		std::cout << "Kante " << counter
+			<< ": von " << lowestCostEdge.getNodeIDV1()
+			<< " nach " << lowestCostEdge.getNodeIDV2()
+			<< " mit Gewicht " << lowestCostEdge.getWeight() << std::endl;
+		counter += 1;
 
 		while (!neighborEdges.empty()) {
 			neighborEdges.pop();
@@ -257,6 +269,13 @@ Graph Algorithm::getNearestNeighborHamiltonianPath(Graph &graph, int startNodeID
 	closingCycleEdge = graph.getEdge(startNodeID, newNode.getID());
 	hamPath.addEdge(closingCycleEdge.getNodeIDV1(), closingCycleEdge.getNodeIDV2(), closingCycleEdge.getWeight());
 	hamPath.updateNeighbour(closingCycleEdge.getNodeIDV1(), closingCycleEdge.getNodeIDV2());
+
+	// TODO Löschen
+	std::cout << "Kante " << counter
+		<< ": von " << closingCycleEdge.getNodeIDV1()
+		<< " nach " << closingCycleEdge.getNodeIDV2()
+		<< " mit Gewicht " << closingCycleEdge.getWeight() << std::endl;
+	std::cout << std::endl << std::endl;
 	return hamPath;
 }
 
@@ -272,25 +291,25 @@ Graph Algorithm::getDoubleTreeHamiltonianPath(Graph &graph, int startNodeID) {
 	mst = Algorithm().getPrimMinimumSpanningTree(graph);
 	std::vector<bool> nodesVisitedDFS(mst.sizeNodes(), false);
 	depthFirstSearch(mst, startNodeID, nodesVisitedDFS);
-	order1 = order;
+	order1 = cOrder;
 
 	hamPath.addNode(startNodeID);
 
-	std::cout << std::endl << std::endl;
+	// TODO Löschen
 	int counter = 0;
-
+	std::cout << "getDoubleTreeHamiltonianPath" << std::endl;
 
 	for (int i = order1.size()-1; 0 <= i; i--) {
 		nodeSecond = Node(order1[i]);
-		order1.pop_back();
+	//	order1.pop_back(); unnötig
 		edge = graph.getEdge(nodeFirst.getID(), nodeSecond.getID());
 
-
+		// TODO Löschen
 		std::cout << "Kante " << counter
 			<< ": von " << edge.getNodeIDV1()
 			<< " nach " << edge.getNodeIDV2()
 			<< " mit Gewicht " << edge.getWeight() << std::endl;
-		counter++;
+		counter += 1;
 
 		hamPath.addNode(nodeSecond);
 		hamPath.addEdge(edge.getNodeIDV1(), edge.getNodeIDV2(), edge.getWeight());
@@ -298,20 +317,116 @@ Graph Algorithm::getDoubleTreeHamiltonianPath(Graph &graph, int startNodeID) {
 
 		nodeFirst = nodeSecond;
 	}
-
-	std::cout << std::endl << std::endl;
-
 	closingCycleEdge = graph.getEdge(startNodeID, nodeFirst.getID());
 	hamPath.addEdge(closingCycleEdge.getNodeIDV1(), closingCycleEdge.getNodeIDV2(), closingCycleEdge.getWeight());
 	hamPath.updateNeighbour(closingCycleEdge.getNodeIDV1(), closingCycleEdge.getNodeIDV2());
 
+	// TODO Löschen
+	std::cout << "Kante " << counter
+		<< ": von " << closingCycleEdge.getNodeIDV1()
+		<< " nach " << closingCycleEdge.getNodeIDV2()
+		<< " mit Gewicht " << closingCycleEdge.getWeight() << std::endl;
+	std::cout << std::endl << std::endl;
 	return hamPath;
-
 }
 
-// Only for testing
+void findOptimalTSP(struct originalGraphInfos &graphInfo, struct SequenceInfos &sequenceInfos, 
+					std::vector<int> nodeSequenceTSP, int currentNode, double currentCost);
+bool nodeExist(std::vector<int> &nodeSequenceTSP, int nodeID);
+Graph bulidGraphFromSequence(struct originalGraphInfos &graphInfo, struct SequenceInfos &sequenceInfos);
+
+struct originalGraphInfos {
+	Graph graph;
+	int size = 0;
+};
+
+struct SequenceInfos {
+	std::vector<int> sequence;
+	double cost = std::numeric_limits<double>::max();
+	bool useBranchBound = true;
+};
+
+Graph Algorithm::getOptimalTSP(Graph &graph, bool useBranchBound){
+	Graph optimalTSP;
+	originalGraphInfos graphInfos;
+	SequenceInfos lowestCostSequenceInfos;
+	std::vector<int> nodeSequenceTSP;
+	int startNodeID = 0;
+	double currentCost = 0;
+
+	graphInfos.graph = graph;
+	graphInfos.size = graph.sizeNodes();
+	lowestCostSequenceInfos.useBranchBound = useBranchBound;
+	
+	findOptimalTSP(graphInfos, lowestCostSequenceInfos, nodeSequenceTSP, startNodeID, currentCost);
+	optimalTSP = bulidGraphFromSequence(graphInfos, lowestCostSequenceInfos);
+
+	return optimalTSP;
+}
+
+void findOptimalTSP(originalGraphInfos &graphInfo, SequenceInfos &lowestCostSequenceInfos,
+					std::vector<int> currentSequence, int currentNode, double currentSequenceCost) {
+	currentSequence.push_back(currentNode);
+
+	if (lowestCostSequenceInfos.useBranchBound && currentSequenceCost > lowestCostSequenceInfos.cost) {
+		return;
+	}
+
+	if (currentSequence.size() == graphInfo.size) {
+		Edge closingCycleEdge = graphInfo.graph.getEdge(0, currentNode);
+		currentSequence.push_back(0);
+		currentSequenceCost = currentSequenceCost + closingCycleEdge.getWeight();
+
+		if (currentSequenceCost < lowestCostSequenceInfos.cost){
+			lowestCostSequenceInfos.cost = currentSequenceCost;
+			lowestCostSequenceInfos.sequence = currentSequence;
+		}
+	}
+	else if(currentSequence.size() < graphInfo.size) {
+		std::vector<int> neighbours = graphInfo.graph.getNeighboursID(currentNode);
+		int neighbourID = -1;
+
+		for(int i = 0; i < neighbours.size(); i++) {
+			neighbourID = neighbours[i];
+
+			if (!nodeExist(currentSequence, neighbourID)) {
+				Edge edge = graphInfo.graph.getEdge(currentNode, neighbourID);
+				double newCurrentCost = currentSequenceCost + edge.getWeight();
+				findOptimalTSP(graphInfo, lowestCostSequenceInfos, currentSequence, neighbourID, newCurrentCost);
+			}
+		}
+	}
+}
+
+bool nodeExist(std::vector<int> &nodeSequence, int nodeID) {
+
+	for (int i = 0; i < nodeSequence.size(); i++) {
+		if (nodeID == nodeSequence[i]) {
+			return true;
+		}
+	}
+	return false;
+}
+
+Graph bulidGraphFromSequence(struct originalGraphInfos &graphInfo, struct SequenceInfos &sequenceInfo) {
+	Graph buildGraph = Graph();
+	Edge edge;
+	int nodeFirstID = 0;
+	int nodeSecondID = 0;
+	
+	for (int i = 0; i < graphInfo.size; i++) {
+		nodeFirstID = sequenceInfo.sequence[i];
+		nodeSecondID = sequenceInfo.sequence[i+1];
+
+		edge = graphInfo.graph.getEdge(nodeFirstID, nodeSecondID);
+		buildGraph.addNode(nodeFirstID);
+		buildGraph.addEdge(edge.getNodeIDV1(), edge.getNodeIDV2(), edge.getWeight());
+		buildGraph.updateNeighbour(edge.getNodeIDV1(), edge.getNodeIDV2());
+	}
+	return buildGraph;
+}
+
 void  Algorithm::test(Graph &graph) {
-	Algorithm().getConnectedComponentWithDFS(graph);
 }
 
 

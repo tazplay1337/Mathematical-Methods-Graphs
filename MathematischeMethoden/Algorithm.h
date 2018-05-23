@@ -13,5 +13,6 @@ public:
 	static double getKruskalMinimumSpanningTreeWeight(Graph &graph);
 	static Graph getNearestNeighborHamiltonianPath(Graph &graph, int startNodeID);
 	static Graph getDoubleTreeHamiltonianPath(Graph &graph, int startNodeID);
+	static Graph getOptimalTSP(Graph &graph, bool useBranchBound = true);
 	static void test(Graph &graph);
 };

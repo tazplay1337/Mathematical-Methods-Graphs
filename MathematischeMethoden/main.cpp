@@ -7,7 +7,14 @@
 #include <string>
 #include <time.h>
 
+
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 3\\G_0.txt";
 const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 3\\K_10.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 3\\K_10e.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 3\\K_12.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 3\\K_12e.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 3\\K_15.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 3\\K_15e.txt";
 
 
 int main() {
@@ -15,6 +22,8 @@ int main() {
 	clock_t clockEnd;
 	float diffClockStartEnd;
 	float entireTerm;
+	int startNode = 0;
+	Graph hamPath;
 
 	// Import
 	clockStart = clock();
@@ -25,29 +34,45 @@ int main() {
 	entireTerm = diffClockStartEnd / CLOCKS_PER_SEC;
 	std::cout << "Time to Import Graph: " << entireTerm << std::endl << std::endl;
 
-	// Nearest Neighbor Hamiltonian Path
+	// DoubleTree
 	clockStart = clock();
-	Graph hamPath = Algorithm().getNearestNeighborHamiltonianPath(mygraph, 7);
+	hamPath = Algorithm().getDoubleTreeHamiltonianPath(mygraph, startNode);
 	clockEnd = clock();
 	diffClockStartEnd = (float)clockEnd - (float)clockStart;
 	entireTerm = diffClockStartEnd / CLOCKS_PER_SEC;
 
-	std::cout << "Number Nodes of Hamiltonian Path: " << hamPath.sizeNodes() << std::endl;
-	std::cout << "Number Edges of Hamiltonian Path: " << hamPath.sizeEdges() << std::endl;
-	std::cout << "Entire Term of Nearest Neighbor: " << entireTerm << std::endl;
-	std::cout << "Cost Hamiltonian Path of Nearest Neighbor : " << hamPath.totalCost() << std::endl << std::endl << std::endl;
+	std::cout << "DoubleTree: " << std::endl;
+	std::cout << "Startnode: " << startNode << std::endl;
+	std::cout << "Number Nodes: " << hamPath.sizeNodes() << std::endl;
+	std::cout << "Number Edges: " << hamPath.sizeEdges() << std::endl;
+	std::cout << "Entire Term: " << entireTerm << std::endl;
+	std::cout << "Cost : " << hamPath.totalCost() << std::endl << std::endl;
 
-	// getNearestNeighborHamiltonianPath
+	// findLowestCostTSP
 	clockStart = clock();
-	hamPath = Algorithm().getDoubleTreeHamiltonianPath(mygraph, 0);
+	hamPath = Algorithm().getOptimalTSP(mygraph, false);
 	clockEnd = clock();
 	diffClockStartEnd = (float)clockEnd - (float)clockStart;
 	entireTerm = diffClockStartEnd / CLOCKS_PER_SEC;
 
-	std::cout << "Number Nodes of Hamiltonian Path: " << hamPath.sizeNodes() << std::endl;
-	std::cout << "Number Edges of Hamiltonian Path: " << hamPath.sizeEdges() << std::endl;
-	std::cout << "Entire Term of Double Tree: " << entireTerm << std::endl;
-	std::cout << "Cost Hamiltonian Path of Double Tree : " << hamPath.totalCost() << std::endl << std::endl;
+	std::cout << "Test all Solutions: " << std::endl;
+	std::cout << "Number Nodes of TSP all Tours: " << hamPath.sizeNodes() << std::endl;
+	std::cout << "Number Edges: " << hamPath.sizeEdges() << std::endl;
+	std::cout << "Entire Term: " << entireTerm << std::endl;
+	std::cout << "Cost: " << hamPath.totalCost() << std::endl << std::endl;
+
+	// findLowestCostTSP
+	clockStart = clock();
+	hamPath = Algorithm().getOptimalTSP(mygraph);
+	clockEnd = clock();
+	diffClockStartEnd = (float)clockEnd - (float)clockStart;
+	entireTerm = diffClockStartEnd / CLOCKS_PER_SEC;
+
+	std::cout << "Branch and Bound: " << std::endl;
+	std::cout << "Number Nodes of TSP all Tours: " << hamPath.sizeNodes() << std::endl;
+	std::cout << "Number Edges: " << hamPath.sizeEdges() << std::endl;
+	std::cout << "Entire Term: " << entireTerm << std::endl;
+	std::cout << "Cost: " << hamPath.totalCost() << std::endl << std::endl;
 
 
 	system("PAUSE");
