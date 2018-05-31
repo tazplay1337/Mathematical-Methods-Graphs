@@ -366,6 +366,7 @@ Graph Algorithm::getOptimalTSP(Graph &graph, bool useBranchBound){
 
 void findOptimalTSP(originalGraphInfos &graphInfo, SequenceInfos &lowestCostSequenceInfos,
 					std::vector<int> currentSequence, int currentNode, double currentSequenceCost) {
+
 	currentSequence.push_back(currentNode);
 
 	if (lowestCostSequenceInfos.useBranchBound && currentSequenceCost > lowestCostSequenceInfos.cost) {
@@ -382,7 +383,7 @@ void findOptimalTSP(originalGraphInfos &graphInfo, SequenceInfos &lowestCostSequ
 			lowestCostSequenceInfos.sequence = currentSequence;
 		}
 	}
-	else if(currentSequence.size() < graphInfo.size) {
+	else if(currentSequence.size() < graphInfo.size) { //unötig
 		std::vector<int> neighbours = graphInfo.graph.getNeighboursID(currentNode);
 		int neighbourID = -1;
 
@@ -392,7 +393,11 @@ void findOptimalTSP(originalGraphInfos &graphInfo, SequenceInfos &lowestCostSequ
 			if (!nodeExist(currentSequence, neighbourID)) {
 				Edge edge = graphInfo.graph.getEdge(currentNode, neighbourID);
 				double newCurrentCost = currentSequenceCost + edge.getWeight();
+				// hier einfügen currentSequence
+				// bool vektor
 				findOptimalTSP(graphInfo, lowestCostSequenceInfos, currentSequence, neighbourID, newCurrentCost);
+				// bool vektor 
+				// hier wegtun currentSequence
 			}
 		}
 	}
