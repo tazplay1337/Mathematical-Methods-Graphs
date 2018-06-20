@@ -22,6 +22,32 @@ Graph DataUtils::importGraphFromAdjList(std::string fromPathOfFile) {
 	return graph;
 }
 
+Graph DataUtils::importDirectedGraphFromAdjList(std::string fromPathOfFile) {
+	std::ifstream importGraph(fromPathOfFile);
+	Graph graph = Graph(true);
+
+	if (importGraph) {
+		importAllNodes(importGraph, graph);
+		importAllEdgesFromAdjList(importGraph, graph);
+	}
+	return graph;
+}
+
+void importAllBalanceNodes(std::ifstream &importGraph, Graph &intoGraph);
+void importAllCostCapaEdgesFromAdjList(std::ifstream &importGraph, Graph &intoGraph);
+
+Graph DataUtils::importDirectedBalanceGraphFromAdjList(std::string fromPathOfFile) {
+	std::ifstream importGraph(fromPathOfFile);
+	Graph graph = Graph(true);
+
+	if (importGraph) {
+		importAllBalanceNodes(importGraph, graph);
+		importAllCostCapaEdgesFromAdjList(importGraph, graph);
+	}
+	return graph;
+
+}
+
 void importAllNodes(std::ifstream &importGraph, Graph &targetGraph) {
 	Node newNode;
 	std::string numOfAllNodesFromImportG;
@@ -53,13 +79,10 @@ void importAllEdgesFromAdjList(std::ifstream &importGraph, Graph &targetGraph) {
 
 		if (isWeight) {
 			targetGraph.addEdge(firstNodeID, SecondNodeID, weight);
-			targetGraph.updateNeighbour(firstNodeID, SecondNodeID);
 		}
 		else {
 			targetGraph.addEdge(firstNodeID, SecondNodeID);
-			targetGraph.updateNeighbour(firstNodeID, SecondNodeID);
 		}
-		
 	}
 }
 
@@ -132,7 +155,6 @@ void importAllEdgesFromAdjMatrix(std::ifstream &importGraph, Graph &targetGraph)
 		for (size_t SecondNodeID = firstNodeID; SecondNodeID < edgeLineInAdjacentList.length(); SecondNodeID++) {
 			if (edgeLineInAdjacentList[SecondNodeID] == cIsEdge) {
 				targetGraph.addEdge(firstNodeID, SecondNodeID);
-				targetGraph.updateNeighbour(firstNodeID, SecondNodeID);
 			}
 		}
 		firstNodeID += 1;
@@ -144,3 +166,70 @@ void removeTabs(std::string &line) {
 }
 
 
+//NEU
+void importAllBalanceNodes(std::ifstream &importGraph, Graph &targetGraph) {
+	Node newNode;
+	std::string numOfAllNodesFromImportG;
+	std::string balanceLineInAdjacentList;
+	double balance = 0.0;
+	getline(importGraph, numOfAllNodesFromImportG);
+
+	for (size_t id = 0; id < std::stoi(numOfAllNodesFromImportG); id++) {
+		getline(importGraph, balanceLineInAdjacentList);
+		balance = stoi(balanceLineInAdjacentList);
+		newNode = Node(id, balance);
+		targetGraph.addNode(newNode);
+	}
+}
+
+bool setCapacityIfExist(std::string &edgeLineInAdjacentList, double &capacity);
+
+void importAllCostCapaEdgesFromAdjList(std::ifstream &importGraph, Graph &targetGraph) {
+	int firstNodeID = 0;
+	int SecondNodeID = 0;
+	double cost = 0.0;
+	double capacity = 0.0;
+
+	std::string edgeLineInAdjacentList;
+
+	while (getline(importGraph, edgeLineInAdjacentList)) {
+		firstNodeID = getFirstNodeIDFromAdjList(edgeLineInAdjacentList);
+		SecondNodeID = getSecondNodeIDFromAdjList(edgeLineInAdjacentList);
+		setWeightIfExist(edgeLineInAdjacentList, cost);
+		setCapacityIfExist(edgeLineInAdjacentList, capacity);
+		targetGraph.addEdge(firstNodeID, SecondNodeID, cost, capacity);
+
+	}
+}
+
+int findThirdTab(std::string &edgeLineInAdjacentList);
+
+bool setCapacityIfExist(std::string &edgeLineInAdjacentList, double &capacity) {
+	const int cOffsetBeginnAfterTab = 1;
+	int indexOfThirdTab = findThirdTab(edgeLineInAdjacentList);
+	bool capacitytExist = false;
+
+	if (indexOfThirdTab != std::string::npos) {
+		int startIndexOfWeight = indexOfThirdTab + cOffsetBeginnAfterTab;
+		int endIndexOfWeight = edgeLineInAdjacentList.size() - 1;
+		capacity = stod(edgeLineInAdjacentList.substr(startIndexOfWeight, endIndexOfWeight));
+		capacitytExist = true;
+	}
+	return capacitytExist;
+}
+
+int findThirdTab(std::string &edgeLineInAdjacentList) {
+	const int cOffsetBeginnAfterTab = 1;
+	size_t firstTab = edgeLineInAdjacentList.find("\t");
+	size_t secondTab = std::string::npos;
+	size_t thirdTab = std::string::npos;
+
+	if (firstTab != std::string::npos) {
+		secondTab = edgeLineInAdjacentList.find("\t", firstTab + cOffsetBeginnAfterTab);
+	}
+
+	if (secondTab != std::string::npos) {
+		thirdTab = edgeLineInAdjacentList.find("\t", secondTab + cOffsetBeginnAfterTab);
+	}
+	return thirdTab;
+}

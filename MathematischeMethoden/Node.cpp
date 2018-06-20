@@ -7,6 +7,11 @@ Node::Node(int id){
 	this->id = id;
 }
 
+Node::Node(int id, double balance) {
+	this->id = id;
+	this->balance = balance;
+}
+
 int Node::getID() {
 	return this->id;
 }
@@ -27,4 +32,12 @@ void Node::pushNeigbourID(int newNeigbourID) {
 
 std::vector<int> Node::getNeigbourIDs() {
 	return this->neigbourIDs;
+}
+
+double Node::getBalance() {
+	return this->balance;
+}
+
+void Node::setBalance(double balance) {
+	this->balance = balance;
 }

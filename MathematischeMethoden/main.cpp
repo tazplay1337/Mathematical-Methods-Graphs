@@ -7,15 +7,21 @@
 #include <string>
 #include <time.h>
 
-const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 4\\Wege1.txt";
-//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 4\\Wege2.txt";
-//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 4\\Wege3.txt";
+const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal1.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal2.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal3.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal4.txt";
+
 
 
 
 int main() {
 	
-	Graph mygraph = DataUtils().importGraphFromAdjList(fromPathOfFile);
+	Graph mygraph = DataUtils().importDirectedBalanceGraphFromAdjList(fromPathOfFile);
+
+	Graph spg = Algorithm().getMinFlowCycleCancelingAlg(mygraph);
+
+	std::cout << "Min Fluss: " << std::endl;
 
 	system("PAUSE");
 	return 0;
@@ -84,7 +90,7 @@ std::cout << "Cost MST of Kruskal : " << mstWeight << std::endl;
 */
 
 
-/* Praktikum 4
+/* Praktikum 3
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 3\\G_0.txt";
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 3\\K_10.txt";
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 3\\K_10e.txt";
@@ -149,4 +155,36 @@ std::cout << "Number Edges: " << hamPath.sizeEdges() << std::endl;
 std::cout << "Entire Term: " << entireTerm << std::endl;
 std::cout << "Cost: " << hamPath.totalCost() << std::endl << std::endl;
 
+*/
+
+/* Praktikum 4
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 4\\Wege1.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 4\\Wege2.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 4\\Wege3.txt";
+const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 4\\G_1_2.txt";
+
+int startnode = 0;
+//Graph mygraph = DataUtils().importDirectedGraphFromAdjList(fromPathOfFile);
+Graph mygraph = DataUtils().importGraphFromAdjList(fromPathOfFile);
+
+std::cout << "Shortest Graph from Node: " << startnode << std::endl << std::endl;
+
+Graph spg = Algorithm().getShortestPathDijkstra(mygraph, startnode);
+
+spg = Algorithm().getShortestPathBellmanFord(mygraph, startnode);
+
+*/
+
+/*
+const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 5\\Fluss.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 5\\Fluss2.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 5\\G_1_2.txt";
+
+int startnode = 0;
+int targetnode = 7;
+Graph mygraph = DataUtils().importDirectedGraphFromAdjList(fromPathOfFile);
+
+Graph spg = Algorithm().getMaxFlowEdmondsKarpAlgorithm(mygraph, startnode, targetnode);
+
+std::cout << "Max Fluss: " << spg.getValTotalFlow() << std::endl;
 */

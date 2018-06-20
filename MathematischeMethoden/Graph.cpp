@@ -4,7 +4,26 @@
 #include <algorithm>
 #include <iostream>
 
-Graph::Graph(){}
+Graph::Graph(){
+	this->edgesDirected = false;
+}
+
+Graph::Graph(bool edgesDirected) {
+	this->edgesDirected = edgesDirected;
+}
+
+Graph::Graph(bool edgesDirected, size_t size, std::unordered_map<std::string, Edge> edges, double valFlow) {
+	this->edgesDirected = edgesDirected;
+	this->edges = edges;
+	this->valTotalFlow = valFlow;
+
+	Node newNode;
+
+	for (size_t id = 0; id < size; id++) {
+		newNode = Node(id);
+		this->nodes.insert({ id, newNode });
+	}
+}
 
 Graph::~Graph(void) {}
 
@@ -16,33 +35,46 @@ void Graph::addNode(Node newNode) {
 	}
 }
 
-std::string createEdgeIndex(int nodeID1, int nodeID2);
+std::string createEdgeIndex(int nodeID1, int nodeID2, bool edgesDirected);
 
 void Graph::addEdge(int nodeID1, int nodeID2) {
-	std::string edgeIndex = createEdgeIndex(nodeID1, nodeID2);
+	std::string edgeIndex = createEdgeIndex(nodeID1, nodeID2, this->edgesDirected);
 	bool edgeNotExist = this->edges.find(edgeIndex) == this->edges.end();
 
 	if (edgeNotExist) {
 		Edge newEdge = Edge(nodeID1, nodeID2);
 		this->edges.insert({ edgeIndex, newEdge });
+		updateNeighbour(nodeID1, nodeID2);
 	}
 } 
 
 void Graph::addEdge(int nodeID1, int nodeID2, double weight) {
-	std::string edgeIndex = createEdgeIndex(nodeID1, nodeID2);
+	std::string edgeIndex = createEdgeIndex(nodeID1, nodeID2, this->edgesDirected);
 	bool edgeNotExist = true; //= this->edges.find(edgeIndex) == this->edges.end();
 
 	if (edgeNotExist) {
 		Edge newEdge = Edge(nodeID1, nodeID2, weight);
 		this->edges.insert({ edgeIndex, newEdge });
+		updateNeighbour(nodeID1, nodeID2);
 	}
 }
 
-std::string createEdgeIndex(int nodeID1, int nodeID2) { //	int index1 = nodeID1 * size + nodeID2;
+void Graph::addEdge(int nodeID1, int nodeID2, double weight, double capacity) {
+	std::string edgeIndex = createEdgeIndex(nodeID1, nodeID2, this->edgesDirected);
+	bool edgeNotExist = true; //= this->edges.find(edgeIndex) == this->edges.end();
+
+	if (edgeNotExist) {
+		Edge newEdge = Edge(nodeID1, nodeID2, weight, capacity);
+		this->edges.insert({ edgeIndex, newEdge });
+		updateNeighbour(nodeID1, nodeID2);
+	}
+}
+
+std::string createEdgeIndex(int nodeID1, int nodeID2, bool edgesDirected) {
 	bool isNodeID1LowerNodeID2 = nodeID1 < nodeID2 ? true : false;
 	std::string index;
 
-	if (isNodeID1LowerNodeID2) {
+	if (edgesDirected || isNodeID1LowerNodeID2) {
 		index = std::to_string(nodeID1) + ":" + std::to_string(nodeID2);
 	}
 	else {
@@ -52,7 +84,7 @@ std::string createEdgeIndex(int nodeID1, int nodeID2) { //	int index1 = nodeID1 
 }
 
 Edge Graph::getEdge(int nodeID1, int nodeID2) {
-	std::string edgeIndex = createEdgeIndex(nodeID1, nodeID2);
+	std::string edgeIndex = createEdgeIndex(nodeID1, nodeID2, this->edgesDirected);
 	bool edgeExist = true; //= this->edges.find(edgeIndex) != this->edges.end();
 
 	if (edgeExist) {
@@ -61,6 +93,19 @@ Edge Graph::getEdge(int nodeID1, int nodeID2) {
 	else{
 		return Edge();
 	}
+}
+
+double Graph::getEdgeCost(int nodeID1, int nodeID2) {
+	std::string edgeIndex = createEdgeIndex(nodeID1, nodeID2, this->edgesDirected);
+	bool edgeExist = true; //= this->edges.find(edgeIndex) != this->edges.end();
+
+	if (edgeExist) {
+		return edges[edgeIndex].getWeight();
+	}
+	else {
+		return std::numeric_limits<double>::max();
+	}
+
 }
 
 std::vector<Edge> Graph::getNodeEdges(int nodeID) {
@@ -79,12 +124,19 @@ std::vector<Edge> Graph::getNodeEdges(int nodeID) {
 
 void Graph::updateNeighbour(int firstNodeID, int secondNodeID) {
 	this->nodes[firstNodeID].pushNeigbourID(secondNodeID);
-	this->nodes[secondNodeID].pushNeigbourID(firstNodeID);	// TODO: If Graph ungerichtet else nicht
+	
+	if(!this->edgesDirected) {
+		this->nodes[secondNodeID].pushNeigbourID(firstNodeID);
+	}
 }
 
 bool Graph::isEmpty() {
 	//TODO
 	return false;
+}
+
+bool Graph::isDirected() {
+	return this->edgesDirected;
 }
 
 Node Graph::getNode(int id) {
@@ -115,6 +167,10 @@ std::vector<int> Graph::getNeighboursID(int nodeID) {
 
 std::unordered_map<int, Node> Graph::getNodes() {
 	return this->nodes;
+}
+
+std::unordered_map<std::string, Edge> Graph::getEdges() {
+	return this->edges;
 }
 
 std::vector<int> Graph::getNodesID() {
@@ -152,6 +208,9 @@ void Graph::printEdges() {
 	int counter = 1;
 
 	for (auto const& p : edges) {
+		if (counter > 30) {
+			break;
+		}
 		edge = p.second;
 		std::cout << "Kante " << counter 
 				  << ": von " << edge.getNodeIDV1() 
@@ -170,6 +229,26 @@ void Graph::copyEdgesInVector(std::vector<Edge> &vectorForEdges) {
 		vectorForEdges.push_back(edge);
 	}
 }
+
+bool Graph::hasNegativeCostEdge() {
+	Edge edge;
+	bool hasNegativeCost = false;
+
+	for (auto const& p : edges) {
+		edge = p.second;
+		
+		if (edge.getWeight() < 0) {
+			hasNegativeCost = true;
+			return hasNegativeCost;
+		}
+	}
+	return hasNegativeCost;
+}
+
+double Graph::getValTotalFlow() {
+	return this->valTotalFlow;
+}
+
 
 
 

@@ -14,5 +14,9 @@ public:
 	static Graph getNearestNeighborHamiltonianPath(Graph &graph, int startNodeID);
 	static Graph getDoubleTreeHamiltonianPath(Graph &graph, int startNodeID);
 	static Graph getOptimalTSP(Graph &graph, bool useBranchBound = true);
+	static Graph getShortestPathDijkstra(Graph &graph, int startNodeID);
+	static Graph getShortestPathBellmanFord(Graph &graph, int startNodeID);
 	static void test(Graph &graph);
+	static Graph getMaxFlowEdmondsKarpAlgorithm(Graph &graph, int startNodeID, int targetNodeID);
+	static Graph getMinFlowCycleCancelingAlg(Graph &graph);
 };

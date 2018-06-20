@@ -4,6 +4,7 @@
 #include <iostream>
 #include <utility>
 #include <queue>
+#include <stack>
 #include <limits>
 
 Algorithm::Algorithm() {};
@@ -60,10 +61,18 @@ void setVisitedNodes(std::vector<bool> &visitedNodes, Graph &graph) {
 	}
 }
 
+std::unordered_map<int, int> bfsParentNodeDictionary;
+
 Graph Algorithm::breadthFirstSearch(Graph &graph, int startNodeID) {
+	Graph connectedComponent;
+	bfsParentNodeDictionary.clear();
+
+	if (graph.isDirected()) {
+		connectedComponent = Graph(true);
+	}
+
 	int currentNodeID = startNodeID;
 	int neighbourNode = 0;
-	Graph connectedComponent;
 	std::queue<int> unprocessedNodes;
 	std::vector<int> neighbourIDsOfcurrentNode;
 	
@@ -81,7 +90,15 @@ Graph Algorithm::breadthFirstSearch(Graph &graph, int startNodeID) {
 			if (!connectedComponent.nodeExist(neighbourNode)) {
 				unprocessedNodes.push(neighbourNode);
 				connectedComponent.addNode(neighbourNode);
-				connectedComponent.addEdge(currentNodeID, neighbourNode);
+
+				if (graph.isDirected()) {
+					double cost = graph.getEdgeCost(currentNodeID, neighbourNode);
+					connectedComponent.addEdge(currentNodeID, neighbourNode, cost);
+				}
+				else {
+					connectedComponent.addEdge(currentNodeID, neighbourNode);
+				}
+				bfsParentNodeDictionary.insert({ neighbourNode, currentNodeID });
 			}
 		}		
 	}
@@ -151,7 +168,7 @@ Graph Algorithm::getPrimMinimumSpanningTree(Graph &graph) {
 			newNode = !mst.nodeExist(lowestCostEdge.getNodeIDV1()) ? Node(lowestCostEdge.getNodeIDV1()) : Node(lowestCostEdge.getNodeIDV2());
 			mst.addNode(newNode);
 			mst.addEdge(lowestCostEdge.getNodeIDV1(), lowestCostEdge.getNodeIDV2(), lowestCostEdge.getWeight());
-			mst.updateNeighbour(lowestCostEdge.getNodeIDV1(), lowestCostEdge.getNodeIDV2());
+//			mst.updateNeighbour(lowestCostEdge.getNodeIDV1(), lowestCostEdge.getNodeIDV2());
 			candidates = findCandidateEdges(newNode, graph, mst);
 			pushEdgesInPQ(candidateEdges, candidates);
 		}
@@ -261,14 +278,14 @@ Graph Algorithm::getNearestNeighborHamiltonianPath(Graph &graph, int startNodeID
 																	   : Node(lowestCostEdge.getNodeIDV2());
 			hamPath.addNode(newNode);
 			hamPath.addEdge(lowestCostEdge.getNodeIDV1(), lowestCostEdge.getNodeIDV2(), lowestCostEdge.getWeight());
-			hamPath.updateNeighbour(lowestCostEdge.getNodeIDV1(), lowestCostEdge.getNodeIDV2());
+//			hamPath.updateNeighbour(lowestCostEdge.getNodeIDV1(), lowestCostEdge.getNodeIDV2());
 			neighbor = findCandidateEdges(newNode, graph, hamPath);
 			pushEdgesInPQ(neighborEdges, neighbor);
 		}
 	}
 	closingCycleEdge = graph.getEdge(startNodeID, newNode.getID());
 	hamPath.addEdge(closingCycleEdge.getNodeIDV1(), closingCycleEdge.getNodeIDV2(), closingCycleEdge.getWeight());
-	hamPath.updateNeighbour(closingCycleEdge.getNodeIDV1(), closingCycleEdge.getNodeIDV2());
+//	hamPath.updateNeighbour(closingCycleEdge.getNodeIDV1(), closingCycleEdge.getNodeIDV2());
 
 	// TODO Löschen
 	std::cout << "Kante " << counter
@@ -313,13 +330,13 @@ Graph Algorithm::getDoubleTreeHamiltonianPath(Graph &graph, int startNodeID) {
 
 		hamPath.addNode(nodeSecond);
 		hamPath.addEdge(edge.getNodeIDV1(), edge.getNodeIDV2(), edge.getWeight());
-		hamPath.updateNeighbour(edge.getNodeIDV1(), edge.getNodeIDV2());
+//		hamPath.updateNeighbour(edge.getNodeIDV1(), edge.getNodeIDV2());
 
 		nodeFirst = nodeSecond;
 	}
 	closingCycleEdge = graph.getEdge(startNodeID, nodeFirst.getID());
 	hamPath.addEdge(closingCycleEdge.getNodeIDV1(), closingCycleEdge.getNodeIDV2(), closingCycleEdge.getWeight());
-	hamPath.updateNeighbour(closingCycleEdge.getNodeIDV1(), closingCycleEdge.getNodeIDV2());
+//	hamPath.updateNeighbour(closingCycleEdge.getNodeIDV1(), closingCycleEdge.getNodeIDV2());
 
 	// TODO Löschen
 	std::cout << "Kante " << counter
@@ -331,7 +348,7 @@ Graph Algorithm::getDoubleTreeHamiltonianPath(Graph &graph, int startNodeID) {
 }
 
 void findOptimalTSP(struct originalGraphInfos &graphInfo, struct SequenceInfos &sequenceInfos, 
-					std::vector<int> nodeSequenceTSP, int currentNode, double currentCost);
+					std::vector<int> &nodeSequenceTSP, int currentNode, double currentCost, std::vector<bool> &nodeVisited);
 bool nodeExist(std::vector<int> &nodeSequenceTSP, int nodeID);
 Graph bulidGraphFromSequence(struct originalGraphInfos &graphInfo, struct SequenceInfos &sequenceInfos);
 
@@ -353,21 +370,22 @@ Graph Algorithm::getOptimalTSP(Graph &graph, bool useBranchBound){
 	std::vector<int> nodeSequenceTSP;
 	int startNodeID = 0;
 	double currentCost = 0;
+	std::vector<bool> visitedNodes(graph.sizeNodes(), false);
 
 	graphInfos.graph = graph;
 	graphInfos.size = graph.sizeNodes();
 	lowestCostSequenceInfos.useBranchBound = useBranchBound;
 	
-	findOptimalTSP(graphInfos, lowestCostSequenceInfos, nodeSequenceTSP, startNodeID, currentCost);
+	findOptimalTSP(graphInfos, lowestCostSequenceInfos, nodeSequenceTSP, startNodeID, currentCost, visitedNodes);
 	optimalTSP = bulidGraphFromSequence(graphInfos, lowestCostSequenceInfos);
 
 	return optimalTSP;
 }
 
 void findOptimalTSP(originalGraphInfos &graphInfo, SequenceInfos &lowestCostSequenceInfos,
-					std::vector<int> currentSequence, int currentNode, double currentSequenceCost) {
+					std::vector<int> &currentSequence, int currentNode, double currentSequenceCost, std::vector<bool> &nodeVisited) {
 
-	currentSequence.push_back(currentNode);
+//	currentSequence.push_back(currentNode);
 
 	if (lowestCostSequenceInfos.useBranchBound && currentSequenceCost > lowestCostSequenceInfos.cost) {
 		return;
@@ -382,20 +400,27 @@ void findOptimalTSP(originalGraphInfos &graphInfo, SequenceInfos &lowestCostSequ
 			lowestCostSequenceInfos.cost = currentSequenceCost;
 			lowestCostSequenceInfos.sequence = currentSequence;
 		}
+//		currentSequence.pop_back();
 	}
 	else if(currentSequence.size() < graphInfo.size) { //unötig
 		std::vector<int> neighbours = graphInfo.graph.getNeighboursID(currentNode);
 		int neighbourID = -1;
 
+		currentSequence.push_back(currentNode);
+		
+
 		for(int i = 0; i < neighbours.size(); i++) {
 			neighbourID = neighbours[i];
-
-			if (!nodeExist(currentSequence, neighbourID)) {
+		//	if (!nodeExist(currentSequence, neighbourID)) {
+			if (!nodeVisited[neighbourID]) {			
 				Edge edge = graphInfo.graph.getEdge(currentNode, neighbourID);
 				double newCurrentCost = currentSequenceCost + edge.getWeight();
 				// hier einfügen currentSequence
 				// bool vektor
-				findOptimalTSP(graphInfo, lowestCostSequenceInfos, currentSequence, neighbourID, newCurrentCost);
+				nodeVisited[neighbourID] = true;
+				findOptimalTSP(graphInfo, lowestCostSequenceInfos, currentSequence, neighbourID, newCurrentCost, nodeVisited);
+				currentSequence.pop_back();
+				nodeVisited[neighbourID] = false;
 				// bool vektor 
 				// hier wegtun currentSequence
 			}
@@ -426,13 +451,397 @@ Graph bulidGraphFromSequence(struct originalGraphInfos &graphInfo, struct Sequen
 		edge = graphInfo.graph.getEdge(nodeFirstID, nodeSecondID);
 		buildGraph.addNode(nodeFirstID);
 		buildGraph.addEdge(edge.getNodeIDV1(), edge.getNodeIDV2(), edge.getWeight());
-		buildGraph.updateNeighbour(edge.getNodeIDV1(), edge.getNodeIDV2());
+//		buildGraph.updateNeighbour(edge.getNodeIDV1(), edge.getNodeIDV2());
 	}
 	return buildGraph;
 }
 
-void  Algorithm::test(Graph &graph) {
+struct dijkstraNode {
+	int id;
+	int parentID = -1;
+	double cost = std::numeric_limits<double>::max();
+};
+
+class compareDijkstraNode {
+public:
+	double operator() (dijkstraNode& n1, dijkstraNode& n2) {
+		return n1.cost > n2.cost;
+	}
+};
+
+Graph bulidGraphFromDijkstraNodes(Graph &orignalGraph, std::vector<dijkstraNode> &dijkstraNodes);
+void printDijkstraNodes(std::vector<dijkstraNode> &dijkstraNodes, std::string algName);
+
+Graph Algorithm::getShortestPathDijkstra(Graph &graph, int startNodeID) {
+
+	if (graph.hasNegativeCostEdge()) {
+		std::cout << "=== Dijkstra ===" << std::endl;
+		std::cout << "Abbruch: negative Kanten Gewichte vorhanden." << std::endl << std::endl;
+		return Graph();
+	}
+
+	Graph shortestPath;
+	std::priority_queue<dijkstraNode, std::vector<dijkstraNode>, compareDijkstraNode> unprocessedNodesPQ;
+	std::vector<bool> visitedNodes(graph.sizeNodes(), false);
+	std::vector<int> neighbourIDsOfcurrentNode;
+	std::vector<dijkstraNode> dijkstraNodes;
+	dijkstraNode dijNode;
+	int neighbourNodeID = 0;
+	double costToNeighbor = 0;
+
+	for (int i = 0; i < graph.sizeNodes(); i++) {
+		dijNode.id = i;
+		dijkstraNodes.push_back(dijNode);
+	}
+
+	dijkstraNodes[startNodeID].cost = 0;
+	dijkstraNodes[startNodeID].parentID = startNodeID;
+
+	unprocessedNodesPQ.push(dijkstraNodes[startNodeID]);
+	
+	while (!unprocessedNodesPQ.empty()) {
+		dijNode = unprocessedNodesPQ.top();
+		unprocessedNodesPQ.pop();
+		
+		if (!visitedNodes[dijNode.id]) {
+			visitedNodes[dijNode.id] = true;
+			neighbourIDsOfcurrentNode = graph.getNeighboursID(dijNode.id);
+
+			for (size_t i = 0; i < neighbourIDsOfcurrentNode.size(); i++) {
+				neighbourNodeID = neighbourIDsOfcurrentNode[i];
+				costToNeighbor = dijNode.cost + graph.getEdgeCost(dijNode.id, neighbourNodeID);
+
+				if (costToNeighbor < dijkstraNodes[neighbourNodeID].cost) {
+					dijkstraNodes[neighbourNodeID].cost = costToNeighbor;
+					dijkstraNodes[neighbourNodeID].parentID = dijNode.id;
+					unprocessedNodesPQ.push(dijkstraNodes[neighbourNodeID]);
+				}
+			}
+		}
+	}
+	shortestPath = bulidGraphFromDijkstraNodes(graph, dijkstraNodes);
+	printDijkstraNodes(dijkstraNodes, "Dijkstra");
+	return shortestPath;
 }
+
+Graph bulidGraphFromDijkstraNodes(Graph &orignalGraph, std::vector<dijkstraNode> &dijkstraNodes) {
+	Graph shortestPath = Graph(true);
+	Node node;
+	Edge edge;
+	dijkstraNode dijNode;
+	int nodeID1 = 0;
+	int nodeID2 = 0;
+	double cost = 0;
+
+
+	for (size_t i = 0; i < dijkstraNodes.size(); i++) {
+		node = Node(i);
+		shortestPath.addNode(node);
+	}
+
+	for (size_t i = 0; i < dijkstraNodes.size(); i++) {
+		nodeID1 = dijkstraNodes[i].parentID;
+		nodeID2 = dijkstraNodes[i].id;
+		cost = orignalGraph.getEdgeCost(nodeID1, nodeID2);
+		edge = Edge();
+		shortestPath.addEdge(nodeID1, nodeID2, cost);
+	}
+	return shortestPath;
+}
+
+void printDijkstraNodes(std::vector<dijkstraNode> &dijkstraNodes, std::string algName) {
+	std::cout << "=== " << algName << " ===" << std::endl;
+
+	for (size_t i = 0; i < 50; i++) {
+		std::cout << "Path to: " << dijkstraNodes[i].id
+				  << " with cost: " << dijkstraNodes[i].cost << std::endl;
+	}
+	std::cout << std::endl << std::endl;
+}
+
+bool bellmanFordIteration(Graph &graph, std::vector<dijkstraNode> &dijkstraNodes);
+void findNegativeCycle(Graph &graph, std::vector<dijkstraNode> &dijkstraNodes, int startNodeID);
+
+Graph Algorithm::getShortestPathBellmanFord(Graph &graph, int startNodeID) {
+	Graph shortestPath;
+	std::vector<dijkstraNode> dijkstraNodes;
+	dijkstraNode dijNode;
+
+	for (int i = 0; i < graph.sizeNodes(); i++) {
+		dijNode.id = i;
+		dijkstraNodes.push_back(dijNode);
+	}
+
+	dijkstraNodes[startNodeID].cost = 0;
+
+	dijkstraNodes[startNodeID].parentID = startNodeID;
+
+	bool bellmanDetermined = true;
+	bool costsImproved = true;
+	bool hasNegativeCycle = false;
+
+	for (int i = 0; costsImproved && i < graph.sizeNodes() - 1; i++) {
+		costsImproved = bellmanFordIteration(graph, dijkstraNodes);
+
+		if (!costsImproved) {
+			bellmanDetermined = false;
+		}
+	}
+
+	if (bellmanDetermined) {
+		costsImproved = bellmanFordIteration(graph, dijkstraNodes);
+		hasNegativeCycle = costsImproved;
+	}
+
+	if (hasNegativeCycle) {
+//		findNegativeCycle(graph, dijkstraNodes, startNodeID);
+		std::cout << "Der Graph enthaelt einen negativen Cyclus!" << std::endl;
+	}
+	else {
+		shortestPath = bulidGraphFromDijkstraNodes(graph, dijkstraNodes);
+		printDijkstraNodes(dijkstraNodes, "BellmanFord");
+	}
+	return shortestPath;
+}
+
+bool bellmanFordIteration(Graph &graph, std::vector<dijkstraNode> &dijkstraNodes) {
+	dijkstraNode dijNode;
+	std::vector<int> neighbourIDsOfcurrentNode;
+	int neighbourNodeID = 0;
+	double costToNeighbor = 0.0;
+	bool costsImproved = false;
+
+	for(int i=0; i < graph.sizeNodes(); i++){
+		dijNode = dijkstraNodes[i];	
+		neighbourIDsOfcurrentNode = graph.getNeighboursID(dijNode.id);
+
+		for (size_t n = 0; n < neighbourIDsOfcurrentNode.size(); n++) {
+			neighbourNodeID = neighbourIDsOfcurrentNode[n];
+			costToNeighbor = dijNode.cost + graph.getEdgeCost(dijNode.id, neighbourNodeID);
+
+			if (costToNeighbor < dijkstraNodes[neighbourNodeID].cost) {
+				dijkstraNodes[neighbourNodeID].cost = costToNeighbor;
+				dijkstraNodes[neighbourNodeID].parentID = dijNode.id;
+				costsImproved = true;
+			}
+		}
+	}
+	return costsImproved;
+}
+
+bool nodeExistInCycle(std::vector<dijkstraNode> &cycle, dijkstraNode &currendNode);
+
+/*
+void findNegativeCycle(Graph &graph, std::vector<dijkstraNode> &dijkstraNodes, int startNodeID) {
+	std::vector<dijkstraNode> cycle;
+	bool cycleFound = false;
+	double cycleCost = 0.0;
+	int startCycleNodeID = startNodeID;
+	dijkstraNode currendNode = dijkstraNodes[startCycleNodeID];
+
+	while (!cycleFound) {
+
+		if (nodeExistInCycle(cycle, currendNode)) {
+
+			if (cycle[0].id == currendNode.id) {
+				cycleFound = true;
+			}
+			else {
+			}
+
+		}
+		else {
+
+		}
+
+		startCycleNodeID += 1;
+		currendNode = dijkstraNodes[startCycleNodeID];
+	}
+}*/
+
+bool nodeExistInCycle(std::vector<dijkstraNode> &cycle, dijkstraNode &currendNode) {
+	return false;
+}
+
+Graph ResidualGraphGenerator(Graph &graph ,std::unordered_map<std::string, Edge> &edgesFlowGraph, 
+							 std::unordered_map<std::string, bool> &indexForwardEdge, std::unordered_map<std::string, bool> &indexBackEdge);
+Edge getCurrentToParentEdge(Graph &g, int sourceID);
+std::string invertEdgeIndex(std::string edgeIndex);
+
+Graph Algorithm::getMaxFlowEdmondsKarpAlgorithm(Graph &graph, int startNodeID, int targetNodeID) {
+	Node hStartNode = graph.getNode(startNodeID);	
+
+	Graph maxFlowGraph;
+	std::unordered_map<std::string, Edge> edgesGraph = graph.getEdges();
+	std::unordered_map<std::string, Edge> edgesFlowGraph;
+	std::string edgeIndex;
+	Edge edge_tmp;
+
+	for (auto const& p : edgesGraph) {
+		std::string edgeIndex = p.first;
+		edge_tmp = p.second;
+		edge_tmp.setWeight(0.0);
+		edgesFlowGraph.insert({ edgeIndex, edge_tmp });
+	}
+	
+	std::unordered_map<std::string, bool> indexForwardEdge;
+	std::unordered_map<std::string, bool> indexBackEdge;
+	Graph residualGraph = ResidualGraphGenerator(graph, edgesFlowGraph, indexForwardEdge, indexBackEdge);
+
+	Graph bfsGraph = breadthFirstSearch(residualGraph, startNodeID);
+
+	double valTotalFlow = 0.0;
+
+	while (bfsGraph.nodeExist(targetNodeID)) {
+		double valAugmentationsValue = std::numeric_limits<double>::max();
+		std::stack<std::string> bfsStackOfEdgeIndexPath;
+		int currentNodeIdInBFSPath = targetNodeID;
+		
+		while (currentNodeIdInBFSPath != startNodeID) {
+			Edge currentToParentEdge = getCurrentToParentEdge(bfsGraph, currentNodeIdInBFSPath);
+
+			if (currentToParentEdge.getWeight() < valAugmentationsValue) {
+				valAugmentationsValue = currentToParentEdge.getWeight();
+			}
+			edgeIndex = std::to_string(currentToParentEdge.getNodeIDV1()) + ":" + std::to_string(currentToParentEdge.getNodeIDV2());
+			bfsStackOfEdgeIndexPath.push(edgeIndex);
+			currentNodeIdInBFSPath = currentToParentEdge.getNodeIDV1();
+		}
+
+		valTotalFlow += valAugmentationsValue;
+
+		std::string hBfsPathEdgeHash;
+
+		std::cout << std::endl;
+
+		while (!bfsStackOfEdgeIndexPath.empty()) {
+			hBfsPathEdgeHash = bfsStackOfEdgeIndexPath.top();
+			bfsStackOfEdgeIndexPath.pop();
+
+			std::cout << "Edge: " << hBfsPathEdgeHash << std::endl;
+
+			if (indexForwardEdge.find(hBfsPathEdgeHash) != indexForwardEdge.end()) {
+				edgesFlowGraph[hBfsPathEdgeHash].addWeight(valAugmentationsValue);
+			}
+			else if (indexBackEdge.find(hBfsPathEdgeHash) != indexBackEdge.end()) {
+				std::string indexOriginalEdge = invertEdgeIndex(hBfsPathEdgeHash);
+				double subtractAugmentationsValue = valAugmentationsValue * -1;
+				edgesFlowGraph[indexOriginalEdge].addWeight(subtractAugmentationsValue);
+			}
+		}
+
+		residualGraph = ResidualGraphGenerator(graph, edgesFlowGraph, indexForwardEdge, indexBackEdge);
+		bfsGraph = breadthFirstSearch(residualGraph, startNodeID);
+	}
+
+	std::cout << std::endl;
+	maxFlowGraph = Graph(true, graph.sizeNodes(), edgesGraph, valTotalFlow);
+	return maxFlowGraph;
+}
+
+Graph ResidualGraphGenerator(Graph &graph, std::unordered_map<std::string, Edge> &edgesFlowGraph,
+							 std::unordered_map<std::string, bool> &indexForwardEdge, std::unordered_map<std::string, bool> &indexBackEdge) {
+	Graph residualGraph = Graph(true);
+	indexBackEdge.clear();
+	indexForwardEdge.clear();
+	Node newNode;
+
+	for (size_t id = 0; id < graph.sizeNodes(); id++) {
+		newNode = Node(id);
+		residualGraph.addNode(newNode);
+	}
+
+	std::unordered_map<std::string, Edge> edgesGraph = graph.getEdges();
+	Edge edgeGraph;
+	Edge edgeFlowGraph;
+	int startNodeID = 0;
+	int targetNodeID = 0;
+	double residualCapacity = 0.0;
+	double currentFlow = 0.0;
+	std::string indexEdge;
+
+	for (auto const& edgeRecord : edgesGraph) {
+		indexEdge = edgeRecord.first;
+		edgeGraph = edgeRecord.second;
+		edgeFlowGraph = edgesFlowGraph[indexEdge];
+
+		residualCapacity = edgeGraph.getWeight() - edgeFlowGraph.getWeight();
+		currentFlow = edgeFlowGraph.getWeight();
+
+		startNodeID = edgeGraph.getNodeIDV1();
+		targetNodeID = edgeGraph.getNodeIDV2();
+
+         if (residualCapacity > 0.0) { // Hinkante einfügen?
+			 residualGraph.addEdge(startNodeID, targetNodeID, residualCapacity);
+			 indexForwardEdge.insert({ indexEdge, true });
+		 }
+
+		if (currentFlow > 0.0) { // Rückkante einfügen?
+			residualGraph.addEdge(targetNodeID, startNodeID, currentFlow);
+			indexEdge = std::to_string(targetNodeID) + ":" + std::to_string(startNodeID);
+			indexBackEdge.insert({ indexEdge, true });
+		}
+	}
+	return residualGraph;
+}
+
+Edge getCurrentToParentEdge(Graph &g, int sourceID) {
+	int parentNode = bfsParentNodeDictionary[sourceID];
+	return g.getEdge(parentNode, sourceID);;
+}
+
+std::string invertEdgeIndex(std::string edgeIndex) {
+	int startIndexFirstNode = 0;
+	int indexSeparator = edgeIndex.find(":");
+	std::string firstNodeID = edgeIndex.substr(startIndexFirstNode, indexSeparator);
+	std::string secondNodeID = edgeIndex.substr(indexSeparator + 1);
+	std::string invertEdgeIndex = secondNodeID + ":" + firstNodeID;
+	return invertEdgeIndex;
+}
+
+Graph Algorithm::getMinFlowCycleCancelingAlg(Graph &graph) {
+	Graph minFlowGraph = graph;
+	int freeNodeId = graph.sizeNodes();
+
+	Node superStart = Node(freeNodeId, 0.0);
+	minFlowGraph.addNode(superStart);
+
+	Node superEnd = Node(freeNodeId + 1, 0.0);
+	minFlowGraph.addNode(superEnd);
+
+	std::unordered_map<int, Node>  minFlowNodes = minFlowGraph.getNodes();
+	Node node;
+	Edge newEdge;
+	double balance = 0;
+	double capacity = 0;
+
+	for (auto const& nodeRecord : minFlowNodes) {
+		node = nodeRecord.second;
+		balance = node.getBalance();
+
+		if (balance > 0.0) {
+			capacity = node.getBalance();
+			minFlowGraph.addEdge(superStart.getID(), node.getID(), capacity);
+		}
+		else if (balance < 0.0) {
+			capacity = node.getBalance() * -1.0;
+			minFlowGraph.addEdge(node.getID(), superEnd.getID(), capacity);
+		}
+	}
+
+
+	return Graph();
+}
+
+
+void  Algorithm::test(Graph &graph) {
+	std::string edgeIndex = "1127:55454";
+	int startIndexFirstNode = 0;
+	int indexSeparator = edgeIndex.find(":");
+	std::string firstNodeID = edgeIndex.substr(startIndexFirstNode, indexSeparator);
+	std::string secondNodeID = edgeIndex.substr(indexSeparator + 1);
+}
+
 
 
 
