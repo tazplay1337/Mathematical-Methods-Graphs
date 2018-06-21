@@ -5,6 +5,7 @@ Node::Node(){}
 
 Node::Node(int id){
 	this->id = id;
+	this->balance = 0;
 }
 
 Node::Node(int id, double balance) {
@@ -27,6 +28,15 @@ void Node::pushNeigbourID(int newNeigbourID) {
 
 	if (isNewNeigbourID) {
 		neigbourIDs.push_back(newNeigbourID);
+	}
+}
+
+void Node::removeNeigbour(double nodeID) {
+
+	for (int i = 0; i < this->neigbourIDs.size(); i++) {
+		if (this->neigbourIDs[i] == nodeID) {
+			this->neigbourIDs.erase(neigbourIDs.begin() + i);
+		}
 	}
 }
 

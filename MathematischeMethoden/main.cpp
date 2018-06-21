@@ -7,16 +7,13 @@
 #include <string>
 #include <time.h>
 
-const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal1.txt";
+const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal0c.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal1.txt";
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal2.txt";
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal3.txt";
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal4.txt";
 
-
-
-
 int main() {
-	
 	Graph mygraph = DataUtils().importDirectedBalanceGraphFromAdjList(fromPathOfFile);
 
 	Graph spg = Algorithm().getMinFlowCycleCancelingAlg(mygraph);

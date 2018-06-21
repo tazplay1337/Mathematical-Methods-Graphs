@@ -12,17 +12,11 @@ Graph::Graph(bool edgesDirected) {
 	this->edgesDirected = edgesDirected;
 }
 
-Graph::Graph(bool edgesDirected, size_t size, std::unordered_map<std::string, Edge> edges, double valFlow) {
+Graph::Graph(bool edgesDirected, std::unordered_map<int, Node> nodes, std::unordered_map<std::string, Edge> edges, double valFlow) {
 	this->edgesDirected = edgesDirected;
 	this->edges = edges;
 	this->valTotalFlow = valFlow;
-
-	Node newNode;
-
-	for (size_t id = 0; id < size; id++) {
-		newNode = Node(id);
-		this->nodes.insert({ id, newNode });
-	}
+	this->nodes = nodes;
 }
 
 Graph::~Graph(void) {}
@@ -105,7 +99,26 @@ double Graph::getEdgeCost(int nodeID1, int nodeID2) {
 	else {
 		return std::numeric_limits<double>::max();
 	}
+}
 
+double Graph::getEdgeCapacity(int nodeID1, int nodeID2) {
+	std::string edgeIndex = createEdgeIndex(nodeID1, nodeID2, this->edgesDirected);
+	bool edgeExist = true; //= this->edges.find(edgeIndex) != this->edges.end();
+
+	if (edgeExist) {
+		return edges[edgeIndex].getCapacity();
+	}
+	else {
+		return std::numeric_limits<double>::max();
+	}
+}
+
+void Graph::setEdgeFlow(std::string index, double flow) {
+	bool edgeExist = true; //= this->edges.find(edgeIndex) != this->edges.end();
+
+	if (edgeExist) {
+		edges[index].setFlow(flow);
+	}
 }
 
 std::vector<Edge> Graph::getNodeEdges(int nodeID) {
@@ -147,6 +160,17 @@ Node Graph::getNode(int id) {
 	}
 	else{
 		return nodes[id];
+	}
+}
+
+double  Graph::getNodeBalance(int id) {
+	bool nodeNotExist = nodes.find(id) == nodes.end();
+
+	if (nodeNotExist) {
+		return 0;
+	}
+	else {
+		return nodes[id].getBalance();
 	}
 }
 
@@ -247,6 +271,43 @@ bool Graph::hasNegativeCostEdge() {
 
 double Graph::getValTotalFlow() {
 	return this->valTotalFlow;
+}
+
+void Graph::deleteNode(int nodeID) {
+	std::vector<int> neigbourIDs = this->nodes[nodeID].getNeigbourIDs();
+	std::string edgeIndexForward;
+	std::string edgeIndexBackward;
+	bool edgeIndexForwardExist;
+	bool edgeIndexBackwardExist;
+
+	for (int i = 0; i < neigbourIDs.size(); i++) {
+		edgeIndexForward = createEdgeIndex(nodeID, neigbourIDs[i], this->edgesDirected);
+		edgeIndexBackward = createEdgeIndex(neigbourIDs[i], nodeID, this->edgesDirected);
+
+		edgeIndexForwardExist = this->edges.find(edgeIndexForward) != this->edges.end();
+		edgeIndexBackwardExist = this->edges.find(edgeIndexBackward) != this->edges.end();
+
+		if (edgeIndexForwardExist) {
+			this->edges.erase(edgeIndexForward);
+		}
+		else if(edgeIndexBackwardExist) {
+			this->edges.erase(edgeIndexBackward);
+			this->nodes[neigbourIDs[i]].removeNeigbour(nodeID);
+		}
+	}
+
+	for (int nodeID2 = 0; nodeID2 < nodes.size(); nodeID2++) {
+		edgeIndexBackward = createEdgeIndex(nodeID2, nodeID, this->edgesDirected);
+
+		edgeIndexBackwardExist = this->edges.find(edgeIndexBackward) != this->edges.end();
+
+		if (edgeIndexBackwardExist) {
+			this->edges.erase(edgeIndexBackward);
+			this->nodes[nodeID2].removeNeigbour(nodeID);
+		}
+	}
+
+	this->nodes.erase(nodeID);
 }
 
 

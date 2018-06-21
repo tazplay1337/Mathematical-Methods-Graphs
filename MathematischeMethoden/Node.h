@@ -11,6 +11,7 @@ public:
 	void pushNeigbourID(int neigbourID);
 	double getBalance();
 	void setBalance(double balance);
+	void removeNeigbour(double nodeID);
 private:
 	int id;
 	double balance;

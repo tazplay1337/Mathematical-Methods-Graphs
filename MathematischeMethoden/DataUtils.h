@@ -9,4 +9,5 @@ public:
 	static Graph importGraphFromAdjMatrix(std::string fromPathOfFile);
 	static Graph importDirectedGraphFromAdjList(std::string fromPathOfFile);
 	static Graph importDirectedBalanceGraphFromAdjList(std::string fromPathOfFile);
+	static Graph importDirectedGraphWithCapacityFromAdjList(std::string fromPathOfFile);
 };

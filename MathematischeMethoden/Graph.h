@@ -18,7 +18,7 @@ private:
 public:
 	Graph();
 	Graph(bool edgesDirected);
-	Graph(bool edgesDirected, size_t size, std::unordered_map<std::string, Edge> edges, double valFlow);
+	Graph(bool edgesDirected, std::unordered_map<int, Node> nodes, std::unordered_map<std::string, Edge> edges, double valFlow);
 	~Graph();
 	bool isEmpty();
 	bool isDirected();
@@ -26,8 +26,10 @@ public:
 	int sizeEdges();
 	int sizeNodes();
 	Node getNode(int id);
+	double getNodeBalance(int id);
 	Edge getEdge(int nodeID1, int nodeID2);
 	double getEdgeCost(int nodeID1, int nodeID2);
+	double getEdgeCapacity(int nodeID1, int nodeID2);
 	std::unordered_map<int, Node> getNodes();
 	std::unordered_map<std::string, Edge> getEdges();
 	std::vector<int> getNodesID();
@@ -37,6 +39,8 @@ public:
 	void addEdge(int Node1, int Node2);
 	void addEdge(int Node1, int Node2, double weight);
 	void addEdge(int Node1, int Node2, double weight, double capacity);
+	void deleteNode(int nodeID);
+	void setEdgeFlow(std::string index, double flow);
 	double totalCost();
 	double getValTotalFlow();
 	bool hasNegativeCostEdge();

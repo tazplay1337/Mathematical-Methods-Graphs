@@ -33,6 +33,19 @@ Graph DataUtils::importDirectedGraphFromAdjList(std::string fromPathOfFile) {
 	return graph;
 }
 
+void importAllCapacityEdgesFromAdjList(std::ifstream &importGraph, Graph &intoGraph);
+
+Graph DataUtils::importDirectedGraphWithCapacityFromAdjList(std::string fromPathOfFile) {
+	std::ifstream importGraph(fromPathOfFile);
+	Graph graph = Graph(true);
+
+	if (importGraph) {
+		importAllNodes(importGraph, graph);
+		importAllCapacityEdgesFromAdjList(importGraph, graph);
+	}
+	return graph;
+}
+
 void importAllBalanceNodes(std::ifstream &importGraph, Graph &intoGraph);
 void importAllCostCapaEdgesFromAdjList(std::ifstream &importGraph, Graph &intoGraph);
 
@@ -83,6 +96,21 @@ void importAllEdgesFromAdjList(std::ifstream &importGraph, Graph &targetGraph) {
 		else {
 			targetGraph.addEdge(firstNodeID, SecondNodeID);
 		}
+	}
+}
+
+void importAllCapacityEdgesFromAdjList(std::ifstream &importGraph, Graph &targetGraph) {
+	int firstNodeID = 0;
+	int SecondNodeID = 0;
+	double capacity = 0;
+
+	std::string edgeLineInAdjacentList;
+
+	while (getline(importGraph, edgeLineInAdjacentList)) {
+		firstNodeID = getFirstNodeIDFromAdjList(edgeLineInAdjacentList);
+		SecondNodeID = getSecondNodeIDFromAdjList(edgeLineInAdjacentList);
+		setWeightIfExist(edgeLineInAdjacentList, capacity);
+		targetGraph.addEdge(firstNodeID, SecondNodeID, 0, capacity);
 	}
 }
 

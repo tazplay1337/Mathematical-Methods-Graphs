@@ -6,8 +6,8 @@ private:
 	int nodeIDV2;
 	double weight;
 	double capacity;
+	double flow;
 	bool hasWeigt;
-	bool hasCapacity;
 	bool beInExistence;
 	
 public:	
@@ -20,5 +20,11 @@ public:
 	double getWeight();
 	void setWeight(double weight);
 	void addWeight(double weight);
+	double getCapacity();
+	void setCapacity(double capacity);
+	void addCapacity(double capacity);
+	double getFlow();
+	void setFlow(double flow);
+	void addFlow(double flow);
 	bool exist();
 };
