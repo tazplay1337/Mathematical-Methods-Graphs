@@ -55,12 +55,17 @@ void Graph::addEdge(int nodeID1, int nodeID2, double weight) {
 
 void Graph::addEdge(int nodeID1, int nodeID2, double weight, double capacity) {
 	std::string edgeIndex = createEdgeIndex(nodeID1, nodeID2, this->edgesDirected);
-	bool edgeNotExist = true; //= this->edges.find(edgeIndex) == this->edges.end();
+//	bool edgeNotExist = true; //= this->edges.find(edgeIndex) == this->edges.end();
+
+	bool edgeNotExist = this->edges.find(edgeIndex) == this->edges.end();
 
 	if (edgeNotExist) {
 		Edge newEdge = Edge(nodeID1, nodeID2, weight, capacity);
 		this->edges.insert({ edgeIndex, newEdge });
 		updateNeighbour(nodeID1, nodeID2);
+	}
+	else { 
+		std::cout << "DoppelKante: " << nodeID1 << ":" << nodeID2 << std::endl;
 	}
 }
 
@@ -103,6 +108,18 @@ double Graph::getEdgeCost(int nodeID1, int nodeID2) {
 
 double Graph::getEdgeCapacity(int nodeID1, int nodeID2) {
 	std::string edgeIndex = createEdgeIndex(nodeID1, nodeID2, this->edgesDirected);
+	bool edgeExist = true; //= this->edges.find(edgeIndex) != this->edges.end();
+
+	if (edgeExist) {
+		return edges[edgeIndex].getCapacity();
+	}
+	else {
+		return std::numeric_limits<double>::max();
+	}
+}
+
+double Graph::getEdgeCapacity(std::string index ) {
+	std::string edgeIndex = index;
 	bool edgeExist = true; //= this->edges.find(edgeIndex) != this->edges.end();
 
 	if (edgeExist) {
@@ -223,6 +240,17 @@ double Graph::totalCost() {
 	for (auto const& p : edges) {
 		edge = p.second;
 		totalCost += edge.getWeight();
+	}
+	return totalCost;
+}
+
+double Graph::totalFlowCost() {
+	Edge edge;
+	double totalCost = 0;
+
+	for (auto const& p : edges) {
+		edge = p.second;
+		totalCost += edge.getWeight() * edge.getFlow();
 	}
 	return totalCost;
 }

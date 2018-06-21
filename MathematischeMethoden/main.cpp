@@ -12,13 +12,14 @@ const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal2.txt";
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal3.txt";
 //const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal4.txt";
+//const std::string fromPathOfFile = "C:\\Users\\taz\\Dropbox\\00 Rund ums Studium\\Mathematische Methoden\\Praktikum 6\\Kostenminimal5.txt";
 
 int main() {
 	Graph mygraph = DataUtils().importDirectedBalanceGraphFromAdjList(fromPathOfFile);
 
-	Graph spg = Algorithm().getMinFlowCycleCancelingAlg(mygraph);
+	Graph mFlowGraph = Algorithm().getMinFlowCycleCancelingAlg(mygraph);
 
-	std::cout << "Min Fluss: " << std::endl;
+	std::cout << "Min Fluss: " << mFlowGraph.totalFlowCost() << std::endl;
 
 	system("PAUSE");
 	return 0;

@@ -30,6 +30,7 @@ public:
 	Edge getEdge(int nodeID1, int nodeID2);
 	double getEdgeCost(int nodeID1, int nodeID2);
 	double getEdgeCapacity(int nodeID1, int nodeID2);
+	double getEdgeCapacity(std::string index);
 	std::unordered_map<int, Node> getNodes();
 	std::unordered_map<std::string, Edge> getEdges();
 	std::vector<int> getNodesID();
@@ -42,6 +43,7 @@ public:
 	void deleteNode(int nodeID);
 	void setEdgeFlow(std::string index, double flow);
 	double totalCost();
+	double totalFlowCost();
 	double getValTotalFlow();
 	bool hasNegativeCostEdge();
 	void printEdges();

@@ -561,7 +561,9 @@ void printDijkstraNodes(std::vector<dijkstraNode> &dijkstraNodes, std::string al
 }
 
 bool bellmanFordIteration(Graph &graph, std::vector<dijkstraNode> &dijkstraNodes);
-void findNegativeCycle(Graph &graph, std::vector<dijkstraNode> &dijkstraNodes, int startNodeID);
+std::vector<std::string> findNegativeCycle(Graph &graph, std::vector<dijkstraNode> &dijkstraNodes, int startNodeID);
+
+std::vector<std::string> negativeCycle;
 
 Graph Algorithm::getShortestPathBellmanFord(Graph &graph, int startNodeID, bool &negativeCycleExist) {
 	Graph shortestPath;
@@ -595,6 +597,7 @@ Graph Algorithm::getShortestPathBellmanFord(Graph &graph, int startNodeID, bool 
 	}
 
 	if (hasNegativeCycle) {
+		negativeCycle.clear();
 		findNegativeCycle(graph, dijkstraNodes, startNodeID);
 		negativeCycleExist = true;
 		std::cout << "Der Graph enthaelt einen negativen Cyclus!" << std::endl;
@@ -633,7 +636,7 @@ bool bellmanFordIteration(Graph &graph, std::vector<dijkstraNode> &dijkstraNodes
 
 int currendNodeAlreadyVisited(std::vector<int> negativeCycleEdges, int nodeID);
 
-void findNegativeCycle(Graph &graph, std::vector<dijkstraNode> &dijkstraNodes, int startNodeID) {
+std::vector<std::string> findNegativeCycle(Graph &graph, std::vector<dijkstraNode> &dijkstraNodes, int startNodeID) {
 	std::vector<dijkstraNode> cycle;
 	std::vector<int> visitedNodes;
 	std::vector<std::string> negativeCycleEdges;
@@ -652,19 +655,24 @@ void findNegativeCycle(Graph &graph, std::vector<dijkstraNode> &dijkstraNodes, i
 	negativeCycleEdges.push_back(edgeIndex);
 
 	while (true) {
-
 		currendNode = dijkstraNodes[parentNode].id;
 		parentNode = dijkstraNodes[parentNode].parentID;
 		
-		edgeIndex = std::to_string(parentNode) + ":" + std::to_string(currendNode);
-		visitedNodes.push_back(currendNode);
-		negativeCycleEdges.push_back(edgeIndex);
-
 		indexNegCycleBeginn = currendNodeAlreadyVisited(visitedNodes, currendNode);
 
 		if (indexNegCycleBeginn != -1) {
-			visitedNodes.erase(visitedNodes.begin(), visitedNodes.begin() + 3);
-
+			visitedNodes.erase(visitedNodes.begin(), visitedNodes.begin() + indexNegCycleBeginn);
+			negativeCycleEdges.erase(negativeCycleEdges.begin(), negativeCycleEdges.begin() + indexNegCycleBeginn);
+			
+			for (int i = negativeCycleEdges.size() - 1; i >= 0; i--) {
+				negativeCycle.push_back(negativeCycleEdges[i]);
+			}
+			return negativeCycleEdges;
+		}
+		else {
+			edgeIndex = std::to_string(parentNode) + ":" + std::to_string(currendNode);
+			visitedNodes.push_back(currendNode);
+			negativeCycleEdges.push_back(edgeIndex);
 		}
 	}
 }
@@ -730,13 +738,13 @@ Graph Algorithm::getMaxFlowEdmondsKarpAlgorithm(Graph &graph, int startNodeID, i
 
 		std::string hBfsPathEdgeHash;
 
-		std::cout << std::endl;
+	//	std::cout << std::endl;
 
 		while (!bfsStackOfEdgeIndexPath.empty()) {
 			hBfsPathEdgeHash = bfsStackOfEdgeIndexPath.top();
 			bfsStackOfEdgeIndexPath.pop();
 
-			std::cout << "Edge: " << hBfsPathEdgeHash << std::endl;
+		//	std::cout << "Edge: " << hBfsPathEdgeHash << std::endl;
 
 			if (indexForwardEdge.find(hBfsPathEdgeHash) != indexForwardEdge.end()) {
 				edgesFlowGraph[hBfsPathEdgeHash].addCapacity(valAugmentationsValue);
@@ -753,7 +761,7 @@ Graph Algorithm::getMaxFlowEdmondsKarpAlgorithm(Graph &graph, int startNodeID, i
 		bfsGraph = breadthFirstSearch(residualGraph, startNodeID);
 	}
 
-	std::cout << std::endl;
+//	std::cout << std::endl;
 	maxFlowGraph = Graph(true, graph.getNodes(), edgesGraph, valTotalFlow);
 	return maxFlowGraph;
 }
@@ -821,8 +829,6 @@ std::string invertEdgeIndex(std::string edgeIndex) {
 Graph residualCostCapacityGraphGenerator(Graph &graph, std::unordered_map<std::string, Edge> &edgesFlowGraph,
 	std::unordered_map<std::string, bool> &indexForwardEdge, std::unordered_map<std::string, bool> &indexBackEdge);
 
-std::vector<std::string> findNegativeCycle(Graph &graph, int startNodeID);
-
 Graph Algorithm::getMinFlowCycleCancelingAlg(Graph &graph) {
 	Graph minFlowGraph = graph;
 	int freeNodeId = graph.sizeNodes();
@@ -875,7 +881,7 @@ Graph Algorithm::getMinFlowCycleCancelingAlg(Graph &graph) {
 
 	maxFlowGraph.deleteNode(superStart.getID());
 	maxFlowGraph.deleteNode(superEnd.getID());
-
+	
 	Graph residualGraph;
 	std::unordered_map<int, Node>  residualNodes;
 	std::unordered_map<std::string, bool> indexForwardEdge;
@@ -883,36 +889,53 @@ Graph Algorithm::getMinFlowCycleCancelingAlg(Graph &graph) {
 
 	Graph shortestPathBFordGraph;
 	bool negativeCycleExist = true;
+	std::vector<std::string> negativeCycleEdges;
+	std::string indexEdge;
+	double edgeCapcaity = 0.0;
 
-	std::unordered_map<std::string, Edge> edgesMaxFlowGraph = maxFlowGraph.getEdges();
+
+	std::unordered_map<std::string, Edge> edgesMinFlowGraph = maxFlowGraph.getEdges();
 
 	while (negativeCycleExist) {
-
-		residualGraph = residualCostCapacityGraphGenerator(graph, edgesMaxFlowGraph, indexForwardEdge, indexBackEdge);
+		negativeCycleExist = false;
+		
+		residualGraph = residualCostCapacityGraphGenerator(graph, edgesMinFlowGraph, indexForwardEdge, indexBackEdge);
 		residualNodes = residualGraph.getNodes();
 
-		// Ausgehend von jedem Knoten wird versucht ein negativer Zykel zu finden
 		for (auto const& nodeRecord : residualNodes) {
-			
-
 			shortestPathBFordGraph = getShortestPathBellmanFord(residualGraph, nodeRecord.first, negativeCycleExist);
 
 			if (negativeCycleExist) {
+				negativeCycleEdges = negativeCycle;
+				double minCapacityCycle = std::numeric_limits<double>::max();
 
+				for (int i = 0; i < negativeCycleEdges.size(); i++) {
+					indexEdge = negativeCycleEdges[i];
+					edgeCapcaity = residualGraph.getEdgeCapacity(indexEdge);
+
+					if (edgeCapcaity < minCapacityCycle) {
+						minCapacityCycle = edgeCapcaity;
+					}
+				}
+
+				for (int i = 0; i < negativeCycleEdges.size(); i++) {
+					indexEdge = negativeCycleEdges[i];
+					
+					if (indexForwardEdge.find(indexEdge) != indexForwardEdge.end()) {
+						edgesMinFlowGraph[indexEdge].addFlow(minCapacityCycle);
+					}
+					else if (indexBackEdge.find(indexEdge) != indexBackEdge.end()) {
+						std::string indexOriginalEdge = invertEdgeIndex(indexEdge);
+						double subtractAugmentationsValue = minCapacityCycle * -1;
+						edgesMinFlowGraph[indexOriginalEdge].addFlow(subtractAugmentationsValue);
+					}
+				}
+				break;
 			}
-
-
-
-
 		}
-
-
 	}
-
-
-
-
-	return Graph();
+	minFlowGraph = Graph(true, graph.getNodes(), edgesMinFlowGraph, 0.0);
+	return minFlowGraph;
 }
 
 Graph residualCostCapacityGraphGenerator(Graph &graph, std::unordered_map<std::string, Edge> &edgesFlowGraph,
